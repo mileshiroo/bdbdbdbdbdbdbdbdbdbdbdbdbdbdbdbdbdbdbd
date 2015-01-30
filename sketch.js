@@ -1,55 +1,149 @@
+var camW; var camH;
+var numFrames = 5;
+var gif;
+var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
+var scaleDownFactor = 3;
 var selection = [];
-var selectionImg;
+var fragments = [];
+var pickedUp = -1;
+var selectionImg = null;
+var recording = false;
 var selectionCreated = false;
 var shared = false;
 var minPt = {x:0, y:0};
 var maxPt = {x:0, y:0};
-var capture;
+var imH; var imH;
+var capture = null;
 var canvas;
+var button;
 var width; var height;
+var fbUrl = "https://torid-fire-4253.firebaseIO.com/fragments/";
+var fbRef = new Firebase(fbUrl);
 
-function share(){
-    var img;
-    try {
-        img = canvas.elt.toDataURL('image/jpeg', 0.9).split(',')[1];
-    } catch(e) {
-        img = canvas.elt.toDataURL().split(',')[1];
-    }
-    $.ajax({
-        url: 'https://api.imgur.com/3/upload.json',
-        type: 'POST',
-        headers: {
-            Authorization: 'Client-ID 2a3f1f63c9b0857'
-        },
-        data: {
-            type: 'base64',
-            name: 'mileshirooleasonpeyton.jpg',
-            title: 'mileshirooleasonpeyton',
-            description: 'mileshirooleasonpeyton',
-            image: img
-        },
-        dataType: 'json'
-    }).success(function(data) {
-        var url = 'http://imgur.com/' + data.data.id + '?tags';
-        print("Uploaded to imgur successfully.");
-        print(url);
-    }).error(function() {
-        print("upload error");
+function saveToFB(thisUrl, thisX, thisY, thisImW, thisImH) {
+    fbRef.push({
+        url: thisUrl,
+        x: thisX,
+        y: thisY,
+        imW: thisImW,
+        imH: thisImH
     });
 }
 
+function buildEndPoint (key) {
+    return new Firebase(fbUrl + key);
+}
+
+function updateFragment(key, x, y) {
+    updateRef = buildEndPoint(key);
+    updateRef.update({x:x,y:y});
+}
+
+function share(){
+    var reader = new window.FileReader();
+    reader.readAsDataURL(gifData);
+    reader.onloadend = function () {
+        $.ajax({
+            url: 'https://api.imgur.com/3/upload.json',
+            type: 'POST',
+            headers: {
+                Authorization: 'Client-ID 2a3f1f63c9b0857'
+            },
+            data: {
+                image: (reader.result).replace('data:image/gif;base64,',''),
+                type: 'base64',
+                name: 'hehehe',
+                title: 'hehehe',
+                description: 'hehehe',
+            },
+            dataType: 'json'
+        }).success(function(data) {
+            var url = 'http://imgur.com/' + data.data.id + '.gif';
+            var thisX = random(width); var thisY = random(height);
+            print("Uploaded to imgur successfully.");
+            print(url);
+            imW /= scaleDownFactor; imH /= scaleDownFactor;
+            saveToFB(url, thisX, thisY, imW, imH);
+        }).error(function() {
+            print("upload error");
+        });
+    }
+}
+
+function fragmentAdded(key) {
+    for(i = 0; i < fragments.length; i++) if(fragments[i].key === key) return i;
+    return -1;
+}
+
+function setupFb() {
+    fbRef.on("value", function(snapshot) {
+        var data = snapshot.val();
+        
+        for (var key in data) {
+            var thisX = data[key].x;
+            var thisY = data[key].y;
+
+            if(data.hasOwnProperty(key)) {
+                var fragIndex = fragmentAdded(key);
+                if(fragIndex != -1) {
+                  fragments[fragIndex].img.position(thisX-fragments[fragIndex].imW/2, thisY-fragments[fragIndex].imH/2);
+                  fragments[fragIndex].x = thisX;
+                  fragments[fragIndex].y = thisY;
+                }
+                else {
+                    var url = data[key].url;
+                    var thisImW = data[key].imW;
+                    var thisImH = data[key].imH;
+                    var thisImg = createImg(url, "");
+                    thisImg.position(thisX-thisImW/2, thisY-thisImH/2);
+                    thisImg.style("width", thisImW);
+                    thisImg.style("height", thisImH);
+                    fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
+                }
+            }
+        }
+
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
+}
+
+function hideFragments() {
+    for(i = 0; i < fragments.length; i++) fragments[i].img.hide();
+}
+
+function showFragments() {
+    for(i = 0; i < fragments.length; i++) fragments[i].img.show();
+}
+
+function startCam() {
+    button.hide();
+    capture = createCapture(VIDEO);
+    capture.size(camW, camH);
+    capture.hide();
+    hideFragments();    
+}
+
 function setup() {
+    textSize(70);
     height = displayHeight;
     width = displayWidth;
+    camW = width; camH = height;
     canvas = createCanvas(width, height);
-    capture = createCapture(VIDEO);
-    capture.size(320, 240);
-    noFill();
+    noStroke();
+    setupFb();
+    
+    //working on dis
+    button = createButton("capture body");
+    button.mousePressed(startCam); 
+    button.position(20,20);
+    button.style("zIndex","1");
 }
 
 function drawSelectionShape() {
+    fill(200,200,255,50);
     beginShape();
     for(var i = 0; i < selection.length; i++) {
        vertex(selection[i].x, selection[i].y); 
@@ -57,30 +151,91 @@ function drawSelectionShape() {
     endShape(CLOSE);
 }
 
-function draw() {
+function generateNewCutout() {
+    if(selection.length > 3 && !selectionCreated) {
+        imW = Math.abs(maxPt.x - minPt.x);
+        imH = Math.abs(maxPt.y - minPt.y);
+        selectionImg = createImage(imW, imH);
+        selectionImg.loadPixels();
+        
+        for(x = minPt.x; x < maxPt.x; x++) {
+            for(y = minPt.y; y < maxPt.y; y++) {
+               if(ptInSelection(x,y)) {
+                    var i = x - minPt.x;
+                    var j = y - minPt.y; 
+                    var colorAtPt = get(x,y);
+                    selectionImg.set(i, j, colorAtPt);
+                }   
+            }
+        }           
+        selectionImg.updatePixels();
+    }
+}
+
+function updateCutout() {
+    image(capture,0,0);
+    generateNewCutout();
     clear();
-    capture.loadPixels();
-    
-    if(selectionCreated) {
-        image(selectionImg, 0, 0);
-        if(!shared) {
-            shared = true;
-            share();
+    background(255);
+    image(selectionImg, 0, 0);
+}
+
+function drawFragmentOutlines() {
+    for(i = 0; i < fragments.length; i++) {
+        var w = fragments[i].imW; var h = fragments[i].imH;
+        rect(fragments[i].x-w/2,fragments[i].y-h/2,fragments[i].imW,fragments[i].imH);
+    }
+}
+
+
+function draw() {
+    if(capture != null) {
+        background(255);
+     
+        if(recording) updateCutout();
+
+        else {
+            clear();
+            image(capture,0,0);
+            drawSelectionShape();
         }
     }
-    else {
-        image(capture,0,0);
-        drawSelectionShape();
-    }
 
+    if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
+    //drawFragmentOutlines();
+}
+
+function mousePressed() {
+    if(capture == null) {
+        if(pickedUp != -1) {
+            fragments[pickedUp].img.style("width", (fragments[pickedUp].imW).toString());
+            fragments[pickedUp].img.style("height", (fragments[pickedUp].imH).toString());
+            pickedUp = -1;
+        }
+        else {
+            for(i = 0; i < fragments.length; i++) {
+                var w = fragments[i].imW; var h = fragments[i].imH;
+                if(mouseX > fragments[i].x - w/2 && mouseX < fragments[i].x + w/2 &&
+                   mouseY > fragments[i].y - h/2 && mouseY < fragments[i].y+ h/2) {
+                    pickedUp = i;
+                }
+            }
+            if(pickedUp != -1) {
+                fragments[pickedUp].img.style("width", (fragments[pickedUp].imW*1.2).toString());
+                fragments[pickedUp].img.style("height", (fragments[pickedUp].imH*1.2).toString());
+            }
+        }
+    }
 }
 
 function mouseDragged() {
-    if(mouseX < minPt.x || selection.length === 0) minPt.x = mouseX;
-    if(mouseY < minPt.y || selection.length === 0) minPt.y = mouseY;
-    if(mouseX > maxPt.x || selection.length === 0) maxPt.x = mouseX;
-    if(mouseY > maxPt.y || selection.length === 0) maxPt.y = mouseY;
-    selection.push({x:mouseX,y:mouseY}); 
+    if(capture != null && mouseX < camW && mouseY < camH) {
+        if(mouseX < minPt.x || selection.length === 0) minPt.x = mouseX;
+        if(mouseY < minPt.y || selection.length === 0) minPt.y = mouseY;
+        if(mouseX > maxPt.x || selection.length === 0) maxPt.x = mouseX;
+        if(mouseY > maxPt.y || selection.length === 0) maxPt.y = mouseY;
+        selection.push({x:mouseX,y:mouseY}); 
+    }
 }
 
 function ptInSelection(x, y) {
@@ -100,33 +255,40 @@ function ptInSelection(x, y) {
 }
 
 function mouseReleased() {
-    if(selection.length > 3 && !selectionCreated) {
-        var imW = Math.abs(maxPt.x - minPt.x);
-        var imH = Math.abs(maxPt.y - minPt.y);
-        selectionImg = createImage(imW, imH);
-        selectionImg.loadPixels();
-        
-        for(x = minPt.x; x < maxPt.x; x++) {
-            for(y = minPt.y; y < maxPt.y; y++) {
-               if(ptInSelection(x,y)) {
-                    var i = x - minPt.x;
-                    var j = y - minPt.y; 
-                    var colorAtPt = get(x,y);
-                    selectionImg.set(i, j, colorAtPt);
-                }   
-            }
-        }           
+    if(selection.length >= 3 && !recording) {
+        recording = true;
 
-        selectionImg.updatePixels();
-        selectionCreated = true;
+        generateNewCutout();
+        gif = new GIF({workers: 2, quality: 2, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
+        updateCutout(); 
+        for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
+        gif.render();
+        gif.on('finished', function(blob) {
+            clear();
+            recording = false;
+            selection = [];
+            button.show();
+            showFragments();
+            capture = null;
+            selectionImg = null;
+            gifData = blob;
+            shared = true;
+            share();
+        });
     }
 }
 
 function keyPressed() {
-    //clear selection
-    if(keyCode === 67) {
-        selection = [];
-    }
+    //delete current one
+    if(keyCode == 88) {
+        if(pickedUp != -1) {
+            var selRef = buildEndPoint(fragments[pickedUp].key);
+            fragments[pickedUp].img.remove();
+            fragments.splice(pickedUp, 1);
+            selRef.remove();
+            pickedUp = -1;
+        }
+    } 
     
     //fullscreen
     if(keyCode === 70) {
