@@ -159,6 +159,8 @@ function setup() {
     
     buttons.push(captureButton);
     buttons.push(fullscreenButton);
+
+    gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
 }
 
 function hideButtons() {
@@ -289,7 +291,6 @@ function mouseReleased() {
     if(selection.length >= 3 && !recording) {
         recording = true;
         generateNewCutout();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
         updateCutout(); 
         for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
         gif.render();
