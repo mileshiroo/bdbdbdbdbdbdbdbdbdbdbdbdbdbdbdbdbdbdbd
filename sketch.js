@@ -1,4 +1,5 @@
 var camW; var camH;
+var framesAdded = 0;
 var numFrames = 5;
 var gif = null;
 var gifData = null;
@@ -207,7 +208,6 @@ function updateCutout() {
     fill(255);
     image(selectionImg,0,0,width,height);
     rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
-    //background(255);
     image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
 }
 
@@ -233,6 +233,12 @@ function draw() {
             updateCutout();
             fill(255,0,0,255*((frameCount/2)%2));
             ellipse(width/2-25,height/2-25,50,50);
+            if(framesAdded < numFrames) {
+                gif.addFrame(canvas.elt, {delay : 50});
+                numFrames++;
+            }
+            else if(framesAdded == numFrames) gif.render();
+            //for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
         }
 
         else {
@@ -291,8 +297,8 @@ function mouseReleased() {
         recording = true;
         generateNewCutout();
         updateCutout(); 
-        for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
-        gif.render();
+        //for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
+        //gif.render();
         gif.on('finished', function(blob) {
             clear();
             recording = false;
