@@ -289,7 +289,7 @@ function mouseReleased() {
     if(selection.length >= 3 && !recording) {
         recording = true;
         generateNewCutout();
-        gif = new GIF({workers: 1, quality: 2, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
         updateCutout(); 
         for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
         gif.render();
