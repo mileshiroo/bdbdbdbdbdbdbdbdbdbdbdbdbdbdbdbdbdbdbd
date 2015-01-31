@@ -1,6 +1,6 @@
 var camW; var camH;
 var numFrames = 5;
-var gif;
+var gif = null;
 var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
@@ -159,8 +159,6 @@ function setup() {
     
     buttons.push(captureButton);
     buttons.push(fullscreenButton);
-
-    gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
 }
 
 function hideButtons() {
@@ -184,6 +182,7 @@ function generateNewCutout() {
     if(selection.length > 3 && !selectionCreated) {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
+        if(gif == null) gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
         selectionImg = createImage(imW, imH);
         selectionImg.loadPixels();
         
