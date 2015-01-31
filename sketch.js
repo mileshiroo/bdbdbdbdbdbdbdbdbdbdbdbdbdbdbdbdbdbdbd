@@ -6,6 +6,7 @@ var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
 var scaleDownFactor = 3;
 var selection = [];
+var captureOn = false;
 var fragments = [];
 var pickedUp = -1;
 var selectionImg = null;
@@ -96,10 +97,11 @@ function setupFb() {
                     var url = data[key].url;
                     var thisImW = data[key].imW;
                     var thisImH = data[key].imH;
-                    var thisImg = createImg(url, "");
+                    var thisImg = createDiv("");
                     thisImg.position(thisX-thisImW/2, thisY-thisImH/2);
                     thisImg.style("width", thisImW);
                     thisImg.style("height", thisImH);
+                    thisImg.style("background", "url('"+url+"')");
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
                 }
             }
@@ -119,31 +121,34 @@ function showFragments() {
 }
 
 function startCam() {
+    if(capture == null) {
+        capture = createCapture(VIDEO);
+        capture.size(camW, camH);
+        capture.hide();
+    }
+    captureOn = true;
+    cursor(CROSS);
     button.hide();
-    capture = createCapture(VIDEO);
-    capture.size(camW, camH);
-    capture.hide();
     hideFragments();    
 }
 
 function setup() {
-    textSize(70);
     height = displayHeight;
     width = displayWidth;
     camW = width; camH = height;
     canvas = createCanvas(width, height);
     noStroke();
+    textFont("Arial");
     setupFb();
     
-    //working on dis
-    button = createButton("capture body");
+    button = createButton("add something");
     button.mousePressed(startCam); 
     button.position(20,20);
     button.style("zIndex","1");
 }
 
 function drawSelectionShape() {
-    fill(200,200,255,50);
+    fill(200,200,255,120);
     beginShape();
     for(var i = 0; i < selection.length; i++) {
        vertex(selection[i].x, selection[i].y); 
@@ -176,8 +181,11 @@ function updateCutout() {
     image(capture,0,0);
     generateNewCutout();
     clear();
-    background(255);
-    image(selectionImg, 0, 0);
+    fill(255);
+    image(selectionImg,0,0,width,height);
+    rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
+    //background(255);
+    image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
 }
 
 function drawFragmentOutlines() {
@@ -187,17 +195,29 @@ function drawFragmentOutlines() {
     }
 }
 
+function showMessage(message) {
+    textAlign(CENTER);
+    textSize(50);
+    fill(0);
+    text(message, width/2, height/2);
+}
 
 function draw() {
-    if(capture != null) {
+    if(captureOn) {
         background(255);
      
-        if(recording) updateCutout();
+        if(recording){
+            updateCutout();
+            fill(255,0,0,255*((frameCount/2)%2));
+            ellipse(width/2-25,height/2-25,50,50);
+            //showMessage("recording...");
+        }
 
         else {
             clear();
+            showMessage("enable your cam");
             image(capture,0,0);
-            drawSelectionShape();
+            drawSelectionShape(); 
         }
     }
 
@@ -206,35 +226,24 @@ function draw() {
 }
 
 function mousePressed() {
-    if(capture == null) {
-        if(pickedUp != -1) {
-            fragments[pickedUp].img.style("width", (fragments[pickedUp].imW).toString());
-            fragments[pickedUp].img.style("height", (fragments[pickedUp].imH).toString());
-            pickedUp = -1;
-        }
-        else {
-            for(i = 0; i < fragments.length; i++) {
-                var w = fragments[i].imW; var h = fragments[i].imH;
-                if(mouseX > fragments[i].x - w/2 && mouseX < fragments[i].x + w/2 &&
-                   mouseY > fragments[i].y - h/2 && mouseY < fragments[i].y+ h/2) {
-                    pickedUp = i;
-                }
-            }
-            if(pickedUp != -1) {
-                fragments[pickedUp].img.style("width", (fragments[pickedUp].imW*1.2).toString());
-                fragments[pickedUp].img.style("height", (fragments[pickedUp].imH*1.2).toString());
-            }
-        }
-    }
 }
 
 function mouseDragged() {
-    if(capture != null && mouseX < camW && mouseY < camH) {
+    if(!(mouseX == 0 && mouseY == 0) && captureOn && mouseX < camW && mouseY < camH) {
         if(mouseX < minPt.x || selection.length === 0) minPt.x = mouseX;
         if(mouseY < minPt.y || selection.length === 0) minPt.y = mouseY;
         if(mouseX > maxPt.x || selection.length === 0) maxPt.x = mouseX;
         if(mouseY > maxPt.y || selection.length === 0) maxPt.y = mouseY;
         selection.push({x:mouseX,y:mouseY}); 
+    }
+    if(pickedUp == -1 && !captureOn) {
+        for(i = 0; i < fragments.length; i++) {
+            var w = fragments[i].imW; var h = fragments[i].imH;
+            if(mouseX > fragments[i].x - w/2 && mouseX < fragments[i].x + w/2 &&
+               mouseY > fragments[i].y - h/2 && mouseY < fragments[i].y+ h/2) {
+                pickedUp = i;
+            }
+        }
     }
 }
 
@@ -255,9 +264,9 @@ function ptInSelection(x, y) {
 }
 
 function mouseReleased() {
+    if(pickedUp != -1) pickedUp = -1;
     if(selection.length >= 3 && !recording) {
         recording = true;
-
         generateNewCutout();
         gif = new GIF({workers: 2, quality: 2, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
         updateCutout(); 
@@ -269,7 +278,9 @@ function mouseReleased() {
             selection = [];
             button.show();
             showFragments();
-            capture = null;
+            //need a better way because don't want to ask for permission each time
+            captureOn = false;
+            cursor(ARROW);
             selectionImg = null;
             gifData = blob;
             shared = true;
