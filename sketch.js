@@ -8,6 +8,7 @@ var scaleDownFactor = 3;
 var selection = [];
 var captureOn = false;
 var fragments = [];
+var buttons = [];
 var pickedUp = -1;
 var selectionImg = null;
 var recording = false;
@@ -18,7 +19,8 @@ var maxPt = {x:0, y:0};
 var imH; var imH;
 var capture = null;
 var canvas;
-var button;
+var captureButton;
+var fullscreenButton;
 var width; var height;
 var fbUrl = "https://torid-fire-4253.firebaseIO.com/fragments/";
 var fbRef = new Firebase(fbUrl);
@@ -128,8 +130,13 @@ function startCam() {
     }
     captureOn = true;
     cursor(CROSS);
-    button.hide();
+    hideButtons();
     hideFragments();    
+}
+
+function changeFullscreen() {
+    var fs = fullscreen();
+    fullscreen(!fs);
 }
 
 function setup() {
@@ -141,10 +148,25 @@ function setup() {
     textFont("Arial");
     setupFb();
     
-    button = createButton("add something");
-    button.mousePressed(startCam); 
-    button.position(20,20);
-    button.style("zIndex","1");
+    captureButton = createButton("add a part");
+    captureButton.mousePressed(startCam); 
+    captureButton.position(20,20);
+    captureButton.style("zIndex","1");
+
+    fullscreenButton = createButton("fullscreen");
+    fullscreenButton.position(100,20);
+    fullscreenButton.mousePressed(changeFullscreen);
+    
+    buttons.push(captureButton);
+    buttons.push(fullscreenButton);
+}
+
+function hideButtons() {
+    for(i = 0; i < buttons.length; i++) buttons[i].hide();
+}
+
+function showButtons() {
+    for(i = 0; i < buttons.length; i++) buttons[i].show();
 }
 
 function drawSelectionShape() {
@@ -197,9 +219,9 @@ function drawFragmentOutlines() {
 
 function showMessage(message) {
     textAlign(CENTER);
-    textSize(50);
+    textSize(20);
     fill(0);
-    text(message, width/2, height/2);
+    text(message, width/2, height*.4);
 }
 
 function draw() {
@@ -210,12 +232,11 @@ function draw() {
             updateCutout();
             fill(255,0,0,255*((frameCount/2)%2));
             ellipse(width/2-25,height/2-25,50,50);
-            //showMessage("recording...");
         }
 
         else {
             clear();
-            showMessage("enable your cam");
+            showMessage("please enable your cam");
             image(capture,0,0);
             drawSelectionShape(); 
         }
@@ -268,7 +289,7 @@ function mouseReleased() {
     if(selection.length >= 3 && !recording) {
         recording = true;
         generateNewCutout();
-        gif = new GIF({workers: 2, quality: 2, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
+        gif = new GIF({workers: 1, quality: 2, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
         updateCutout(); 
         for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
         gif.render();
@@ -276,9 +297,8 @@ function mouseReleased() {
             clear();
             recording = false;
             selection = [];
-            button.show();
+            showButtons();
             showFragments();
-            //need a better way because don't want to ask for permission each time
             captureOn = false;
             cursor(ARROW);
             selectionImg = null;
@@ -300,11 +320,5 @@ function keyPressed() {
             pickedUp = -1;
         }
     } 
-    
-    //fullscreen
-    if(keyCode === 70) {
-        var fs = fullscreen();
-        fullscreen(!fs);
-    }
 }
 
