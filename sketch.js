@@ -306,6 +306,7 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
+        clear();
         resizeCanvas(imW, imH);        
 
         gif.on('finished', function(blob) {
