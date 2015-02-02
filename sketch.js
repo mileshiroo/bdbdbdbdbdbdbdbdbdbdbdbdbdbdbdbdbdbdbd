@@ -230,7 +230,10 @@ function draw() {
         background(255);
      
         if(recording){
+            print("233");
+            print(width);
             updateCutout();
+            print("236");
             if(!rendering && framesAdded < numFrames) {
                 gif.addFrame(canvas.elt, {delay : 50});
                 framesAdded++;
@@ -299,7 +302,9 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
+        print("302");
         canvas.resize(imW, imH);        
+        print("303");
 
         gif.on('finished', function(blob) {
             clear();
