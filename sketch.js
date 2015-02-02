@@ -233,6 +233,8 @@ function draw() {
             print("testing");
             if(width == imW) {
                 print("yes");
+                print("width is"); print(width);
+                print("imw is"); print(imW);
                 updateCutout();
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50});
