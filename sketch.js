@@ -1,5 +1,11 @@
+
+// CHANGE CANVAS SIZE
+// i think it's creating huge ass gifs because the canvas is huge
+
+
 var camW; var camH;
-var numFrames = 5;
+var numFrames = 10;
+var framesAdded = 0;
 var gif = null;
 var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
@@ -12,6 +18,7 @@ var buttons = [];
 var pickedUp = -1;
 var selectionImg = null;
 var recording = false;
+var rendering = false;
 var selectionCreated = false;
 var shared = false;
 var minPt = {x:0, y:0};
@@ -67,8 +74,7 @@ function share(){
             var thisX = random(width); var thisY = random(height);
             print("Uploaded to imgur successfully.");
             print(url);
-            imW /= scaleDownFactor; imH /= scaleDownFactor;
-            saveToFB(url, thisX, thisY, imW, imH);
+            saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
         }).error(function() {
             print("upload error");
         });
@@ -186,13 +192,12 @@ function generateNewCutout() {
         selectionImg = createImage(imW, imH);
         selectionImg.loadPixels();
         
-        for(x = minPt.x; x < maxPt.x; x++) {
-            for(y = minPt.y; y < maxPt.y; y++) {
-               if(ptInSelection(x,y)) {
-                    var i = x - minPt.x;
-                    var j = y - minPt.y; 
+        for(x = 0; x < imW; x++) {
+            for(y = 0; y < imH; y++) {
+               var xOriginal = x+minPt.x; var yOriginal = y+minPt.y;
+               if(ptInSelection(xOriginal,yOriginal)) {
                     var colorAtPt = get(x,y);
-                    selectionImg.set(i, j, colorAtPt);
+                    selectionImg.set(x, y, colorAtPt);
                 }   
             }
         }           
@@ -201,11 +206,11 @@ function generateNewCutout() {
 }
 
 function updateCutout() {
-    image(capture,0,0);
+    image(capture,-minPt.x,-minPt.y);
     generateNewCutout();
     clear();
     fill(255);
-    image(selectionImg,0,0,width,height);
+    //image(selectionImg,0,0,width,height);
     rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
     image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
 }
@@ -230,8 +235,18 @@ function draw() {
      
         if(recording){
             updateCutout();
-            fill(255,0,0,255*((frameCount/2)%2));
-            ellipse(width/2-25,height/2-25,50,50);
+            if(!rendering && framesAdded < numFrames) {
+                gif.addFrame(canvas.elt, {delay : 50});
+                framesAdded++;
+            }   
+            else if(!rendering) {
+                rendering = true;
+                gif.render();
+            }
+            //for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
+            //gif.render();
+            //fill(255,0,0,255*((frameCount/2)%2));
+            //ellipse(width/2-25,height/2-25,50,50);
         }
 
         else {
@@ -288,12 +303,17 @@ function mouseReleased() {
     if(pickedUp != -1) pickedUp = -1;
     if(selection.length >= 3 && !recording) {
         recording = true;
+        rendering = false;
+        gif = null;
         generateNewCutout();
         updateCutout(); 
-        for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
-        gif.render();
+        canvas.resize(imW, imH);        
         gif.on('finished', function(blob) {
             clear();
+            framesAdded = 0;
+            height = displayHeight;
+            width = displayWidth;
+            canvas.resize(width, height);        
             recording = false;
             selection = [];
             showButtons();
