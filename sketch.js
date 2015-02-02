@@ -221,7 +221,8 @@ function draw() {
         background(255);
         if(recording){
             background(255);
-            image(capture,0,0,imW/scaleDownFactor,imH/scaleDownFactor);  
+            
+            image(capture,-minPt.x/scaleDownFactor,-minPt.y/scaleDownFactor,camW/scaleDownFactor,camH/scaleDownFactor);  
             if(mask == null) print("wtf");
             image(mask,0,0);
             if(!rendering && framesAdded < numFrames) {
