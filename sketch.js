@@ -28,7 +28,7 @@ var capture = null;
 var canvas;
 var captureButton;
 var fullscreenButton;
-var width; var height;
+var w; var h;
 var fbUrl = "https://torid-fire-4253.firebaseIO.com/fragments/";
 var fbRef = new Firebase(fbUrl);
 
@@ -71,7 +71,7 @@ function share(){
             dataType: 'json'
         }).success(function(data) {
             var url = 'http://imgur.com/' + data.data.id + '.gif';
-            var thisX = random(width); var thisY = random(height);
+            var thisX = random(w); var thisY = random(h);
             print("Uploaded to imgur successfully.");
             print(url);
             saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
@@ -146,10 +146,10 @@ function changeFullscreen() {
 }
 
 function setup() {
-    height = displayHeight;
-    width = displayWidth;
-    camW = width; camH = height;
-    canvas = createCanvas(width, height);
+    h = displayHeight;
+    w = displayWidth;
+    camW = w; camH = h;
+    canvas = createCanvas(w, h);
     noStroke();
     textFont("Arial");
     setupFb();
@@ -186,7 +186,7 @@ function drawSelectionShape() {
 
 function generateNewCutout() {
     if(selection.length > 3 && !selectionCreated) {
-        if(gif == null) gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, width : imW, height : imH});
+        if(gif == null) gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
         selectionImg = createImage(imW, imH);
         selectionImg.loadPixels();
         
@@ -208,7 +208,6 @@ function updateCutout() {
     generateNewCutout();
     clear();
     fill(255);
-    //image(selectionImg,0,0,width,height);
     rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
     image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
 }
@@ -224,7 +223,7 @@ function showMessage(message) {
     textAlign(CENTER);
     textSize(20);
     fill(0);
-    text(message, width/2, height*.4);
+    text(message, w/2, h*.4);
 }
 
 function draw() {
@@ -241,10 +240,6 @@ function draw() {
                 rendering = true;
                 gif.render();
             }
-            //for(i = 0; i < numFrames; i++) gif.addFrame(canvas.elt, {delay : 50});
-            //gif.render();
-            //fill(255,0,0,255*((frameCount/2)%2));
-            //ellipse(width/2-25,height/2-25,50,50);
         }
 
         else {
@@ -311,9 +306,9 @@ function mouseReleased() {
         gif.on('finished', function(blob) {
             clear();
             framesAdded = 0;
-            height = displayHeight;
-            width = displayWidth;
-            canvas.resize(width, height);        
+            h = displayHeight;
+            w = displayWidth;
+            canvas.resize(w, h);        
             recording = false;
             selection = [];
             showButtons();
