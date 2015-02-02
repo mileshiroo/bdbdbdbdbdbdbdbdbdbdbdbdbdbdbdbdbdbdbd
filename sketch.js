@@ -204,7 +204,9 @@ function generateNewCutout() {
 
 function updateCutout() {
     image(capture,-minPt.x,-minPt.y);
+    print("got to here");
     generateNewCutout();
+    print("but not here");
     clear();
     fill(255);
     rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
