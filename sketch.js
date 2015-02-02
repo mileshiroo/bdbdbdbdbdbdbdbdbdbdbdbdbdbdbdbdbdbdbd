@@ -10,7 +10,7 @@ var gif = null;
 var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
-var scaleDownFactor = 6;
+var scaleDownFactor = 1;
 var selection = [];
 var captureOn = false;
 var fragments = [];
@@ -148,7 +148,7 @@ function changeFullscreen() {
 function setup() {
     h = displayHeight;
     w = displayWidth;
-    camW = w; camH = h;
+    camW = 320; camH = 240;
     canvas = createCanvas(w, h);
     noStroke();
     textFont("Arial");
@@ -203,11 +203,8 @@ function generateNewCutout() {
 }
 
 function updateCutout() {
-    print("hello");
     image(capture,-minPt.x,-minPt.y);
-    print("got to here");
     generateNewCutout();
-    print("but not here");
     clear();
     fill(255);
     rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
