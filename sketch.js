@@ -109,6 +109,10 @@ function setupFb() {
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
                 }
             }
+        
+            //UNCOMMENT THIS TO DELETE EVERYTHING
+            //var selRef = buildEndPoint(key);
+            //selRef.remove();
         }
 
     }, function (errorObject) {
@@ -198,40 +202,6 @@ function generateMask() {
     mask.updatePixels();
 }
 
-function generateNewCutout() {
-    if(selection.length > 3 && !selectionCreated) {
-        var imWDown = int(imW/scaleDownFactor); var imHDown = int(imH/scaleDownFactor);
-
-        selectionImg = createImage(imWDown, imHDown);
-
-        selectionImg.loadPixels();
-        
-        for(y = 0; y < imHDown; y++) {
-            for(x = 0; x < imWDown; x++) {
-               var xOriginal = (scaleDownFactor*x)+minPt.x; 
-               var yOriginal = (scaleDownFactor*y)+minPt.y;
-
-               if(ptInSelection(xOriginal,yOriginal)) {
-                    var colorAtPt = get((x*scaleDownFactor),(y*scaleDownFactor));
-                    selectionImg.set(x, y, colorAtPt);
-               }   
-            }
-        }
-
-        selectionImg.updatePixels();
-    }
-}
-
-function updateCutout() {
-    image(capture,-minPt.x,-minPt.y);
-    generateNewCutout();
-    clear();
-    fill(255);
-    rect(0,0,width,height);
-    image(selectionImg,0,0);
-    //image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
-}
-
 function drawFragmentOutlines() {
     for(i = 0; i < fragments.length; i++) {
         var w = fragments[i].imW; var h = fragments[i].imH;
@@ -246,41 +216,22 @@ function showMessage(message) {
     text(message, w/2, h*.4);
 }
 
-//mad expensive to recalculate cutout each frame. generate a white mask ONCE and draw that over the cam feed. 
 function draw() {
     if(captureOn) {
         background(255);
         if(recording){
-            clear();
-            print("1");
+            background(255);
             image(capture,0,0,imW/scaleDownFactor,imH/scaleDownFactor);  
-            print("2");
             if(mask == null) print("wtf");
             image(mask,0,0);
-            print("3");
             if(!rendering && framesAdded < numFrames) {
                 gif.addFrame(canvas.elt, {delay : 50});
                 framesAdded++;
             }   
             else if(!rendering) {
-                print("4");
                 rendering = true;
                 gif.render();
             }
-            print("5");
-
-            /*if(width === imW) {
-                clear();
-                updateCutout();
-                if(!rendering && framesAdded < numFrames) {
-                    gif.addFrame(canvas.elt, {delay : 50});
-                    framesAdded++;
-                }   
-                else if(!rendering) {
-                    rendering = true;
-                    gif.render();
-                }
-            }*/
         }
 
         else {
