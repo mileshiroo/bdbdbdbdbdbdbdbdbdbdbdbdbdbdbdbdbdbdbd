@@ -230,7 +230,9 @@ function draw() {
         background(255);
      
         if(recording){
+            print("testing");
             if(width == imW) {
+                print("yes");
                 updateCutout();
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50});
@@ -241,6 +243,7 @@ function draw() {
                     gif.render();
                 }
             }
+            else print("no");
         }
 
         else {
