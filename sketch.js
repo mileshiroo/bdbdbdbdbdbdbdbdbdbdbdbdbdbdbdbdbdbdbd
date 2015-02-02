@@ -10,7 +10,7 @@ var gif = null;
 var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
-var scaleDownFactor = 3;
+var scaleDownFactor = 6;
 var selection = [];
 var captureOn = false;
 var fragments = [];
@@ -228,13 +228,8 @@ function showMessage(message) {
 function draw() {
     if(captureOn) {
         background(255);
-     
         if(recording){
-            print("testing");
             if(width === imW) {
-                print("yes");
-                print("width is"); print(width);
-                print("imw is"); print(imW);
                 updateCutout();
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50});
@@ -257,7 +252,6 @@ function draw() {
     }
 
     if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
-    //drawFragmentOutlines();
 }
 
 function mousePressed() {
@@ -306,7 +300,6 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
-        clear();
         resizeCanvas(imW, imH);        
 
         gif.on('finished', function(blob) {
