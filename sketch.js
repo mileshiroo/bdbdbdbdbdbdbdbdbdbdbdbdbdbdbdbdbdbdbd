@@ -231,7 +231,7 @@ function draw() {
      
         if(recording){
             print("testing");
-            if(width == imW) {
+            if(width === imW) {
                 print("yes");
                 print("width is"); print(width);
                 print("imw is"); print(imW);
@@ -306,16 +306,14 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
-        print("302");
-        canvas.resize(imW, imH);        
-        print("303");
+        resizeCanvas(imW, imH);        
 
         gif.on('finished', function(blob) {
             clear();
             framesAdded = 0;
             h = displayHeight;
             w = displayWidth;
-            canvas.resize(w, h);        
+            resizeCanvas(w, h);        
             recording = false;
             selection = [];
             showButtons();
