@@ -203,6 +203,7 @@ function generateNewCutout() {
 }
 
 function updateCutout() {
+    print("hello");
     image(capture,-minPt.x,-minPt.y);
     print("got to here");
     generateNewCutout();
