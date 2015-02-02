@@ -1,17 +1,18 @@
 var camW; var camH;
-var numFrames = 10;
+var numFrames = 15;
 var framesAdded = 0;
 var gif = null;
 var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
-var scaleDownFactor = 6;
+var scaleDownFactor = 3;
 var selection = [];
 var captureOn = false;
 var fragments = [];
 var buttons = [];
 var pickedUp = -1;
 var selectionImg = null;
+var mask = null;
 var recording = false;
 var rendering = false;
 var selectionCreated = false;
@@ -179,6 +180,24 @@ function drawSelectionShape() {
     endShape(CLOSE);
 }
 
+function generateMask() {
+    var imWDown = int(imW/scaleDownFactor); var imHDown = int(imH/scaleDownFactor);
+    mask = createImage(imWDown, imHDown);
+    mask.loadPixels();
+    for(y = 0; y < imHDown; y++) {
+        for(x = 0; x < imWDown; x++) {
+           var xOriginal = (scaleDownFactor*x)+minPt.x; 
+           var yOriginal = (scaleDownFactor*y)+minPt.y;
+
+           if(ptInSelection(xOriginal,yOriginal)) {
+               mask.set(x,y,color(255,0));
+           }   
+           else mask.set(x,y,color(255));
+        }
+    }
+    mask.updatePixels();
+}
+
 function generateNewCutout() {
     if(selection.length > 3 && !selectionCreated) {
         var imWDown = int(imW/scaleDownFactor); var imHDown = int(imH/scaleDownFactor);
@@ -227,12 +246,30 @@ function showMessage(message) {
     text(message, w/2, h*.4);
 }
 
+//mad expensive to recalculate cutout each frame. generate a white mask ONCE and draw that over the cam feed. 
 function draw() {
     if(captureOn) {
         background(255);
         if(recording){
-            if(width === imW) {
-                print("it was true?");
+            clear();
+            print("1");
+            image(capture,0,0,imW/scaleDownFactor,imH/scaleDownFactor);  
+            print("2");
+            if(mask == null) print("wtf");
+            image(mask,0,0);
+            print("3");
+            if(!rendering && framesAdded < numFrames) {
+                gif.addFrame(canvas.elt, {delay : 50});
+                framesAdded++;
+            }   
+            else if(!rendering) {
+                print("4");
+                rendering = true;
+                gif.render();
+            }
+            print("5");
+
+            /*if(width === imW) {
                 clear();
                 updateCutout();
                 if(!rendering && framesAdded < numFrames) {
@@ -243,8 +280,7 @@ function draw() {
                     rendering = true;
                     gif.render();
                 }
-            }
-            else print("no");
+            }*/
         }
 
         else {
@@ -303,15 +339,17 @@ function mouseReleased() {
         rendering = false;
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
+        generateMask();
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
-        resizeCanvas(imW, imH);        
+        resizeCanvas(imW/scaleDownFactor, imH/scaleDownFactor);        
 
         gif.on('finished', function(blob) {
-            clear();
             framesAdded = 0;
             h = displayHeight;
             w = displayWidth;
             resizeCanvas(w, h);        
+            clear();
+            background(255);
             recording = false;
             selection = [];
             showButtons();
