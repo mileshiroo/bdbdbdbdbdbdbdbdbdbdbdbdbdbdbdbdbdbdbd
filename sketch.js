@@ -186,7 +186,6 @@ function drawSelectionShape() {
 
 function generateNewCutout() {
     if(selection.length > 3 && !selectionCreated) {
-        if(gif == null) gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
         selectionImg = createImage(imW, imH);
         selectionImg.loadPixels();
         
@@ -297,12 +296,11 @@ function mouseReleased() {
     if(selection.length >= 3 && !recording) {
         recording = true;
         rendering = false;
-        gif = null;
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
         canvas.resize(imW, imH);        
-        generateNewCutout();
-        updateCutout(); 
+
         gif.on('finished', function(blob) {
             clear();
             framesAdded = 0;
