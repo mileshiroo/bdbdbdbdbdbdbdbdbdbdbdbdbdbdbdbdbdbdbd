@@ -305,13 +305,9 @@ function mouseReleased() {
         recording = true;
         rendering = false;
         gif = null;
-        print("1");
-        generateNewCutout();
-        print("2");
-        updateCutout(); 
-        print("3");
         canvas.resize(imW, imH);        
-        print("4");
+        generateNewCutout();
+        updateCutout(); 
         gif.on('finished', function(blob) {
             clear();
             framesAdded = 0;
