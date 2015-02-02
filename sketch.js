@@ -1,8 +1,3 @@
-
-// CHANGE CANVAS SIZE
-// i think it's creating huge ass gifs because the canvas is huge
-
-
 var camW; var camH;
 var numFrames = 10;
 var framesAdded = 0;
@@ -10,7 +5,7 @@ var gif = null;
 var gifData = null;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
-var scaleDownFactor = 1;
+var scaleDownFactor = 6;
 var selection = [];
 var captureOn = false;
 var fragments = [];
@@ -148,7 +143,7 @@ function changeFullscreen() {
 function setup() {
     h = displayHeight;
     w = displayWidth;
-    camW = 320; camH = 240;
+    camW = w; camH = h;
     canvas = createCanvas(w, h);
     noStroke();
     textFont("Arial");
@@ -186,18 +181,24 @@ function drawSelectionShape() {
 
 function generateNewCutout() {
     if(selection.length > 3 && !selectionCreated) {
-        selectionImg = createImage(imW, imH);
+        var imWDown = int(imW/scaleDownFactor); var imHDown = int(imH/scaleDownFactor);
+
+        selectionImg = createImage(imWDown, imHDown);
+
         selectionImg.loadPixels();
         
-        for(x = 0; x < imW; x++) {
-            for(y = 0; y < imH; y++) {
-               var xOriginal = x+minPt.x; var yOriginal = y+minPt.y;
+        for(y = 0; y < imHDown; y++) {
+            for(x = 0; x < imWDown; x++) {
+               var xOriginal = (scaleDownFactor*x)+minPt.x; 
+               var yOriginal = (scaleDownFactor*y)+minPt.y;
+
                if(ptInSelection(xOriginal,yOriginal)) {
-                    var colorAtPt = get(x,y);
+                    var colorAtPt = get((x*scaleDownFactor),(y*scaleDownFactor));
                     selectionImg.set(x, y, colorAtPt);
-                }   
+               }   
             }
-        }           
+        }
+
         selectionImg.updatePixels();
     }
 }
@@ -207,8 +208,9 @@ function updateCutout() {
     generateNewCutout();
     clear();
     fill(255);
-    rect(0,0,(imW*1.2)/scaleDownFactor,(imH*1.2)/scaleDownFactor);
-    image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
+    rect(0,0,width,height);
+    image(selectionImg,0,0);
+    //image(selectionImg, 0, 0,imW/scaleDownFactor,imH/scaleDownFactor);
 }
 
 function drawFragmentOutlines() {
