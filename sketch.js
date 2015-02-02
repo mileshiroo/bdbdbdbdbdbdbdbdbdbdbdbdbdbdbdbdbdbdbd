@@ -230,6 +230,8 @@ function draw() {
         background(255);
         if(recording){
             if(width === imW) {
+                print("it was true?");
+                clear();
                 updateCutout();
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50});
