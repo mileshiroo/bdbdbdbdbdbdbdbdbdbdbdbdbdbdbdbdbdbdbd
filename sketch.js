@@ -230,17 +230,16 @@ function draw() {
         background(255);
      
         if(recording){
-            print("233");
-            print(width);
-            updateCutout();
-            print("236");
-            if(!rendering && framesAdded < numFrames) {
-                gif.addFrame(canvas.elt, {delay : 50});
-                framesAdded++;
-            }   
-            else if(!rendering) {
-                rendering = true;
-                gif.render();
+            if(width == imW) {
+                updateCutout();
+                if(!rendering && framesAdded < numFrames) {
+                    gif.addFrame(canvas.elt, {delay : 50});
+                    framesAdded++;
+                }   
+                else if(!rendering) {
+                    rendering = true;
+                    gif.render();
+                }
             }
         }
 
