@@ -9,7 +9,7 @@ var recImg;
 var recImgVisible = false;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
-var scaleDownFactor = 3;
+var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
 var fragments = [];
@@ -214,7 +214,7 @@ function generateMask() {
            if(ptInSelection(xOriginal,yOriginal)) {
                mask.set(x,y,color(255,0));
            }   
-           else mask.set(x,y,color(255,3,243));
+           else mask.set(x,y,color(0,255,0));
         }
     }
     mask.updatePixels();
@@ -307,7 +307,7 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFF03F3, w : imW, h : imH});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
         canvas.position(-width, -height);
         recImgVisible = true;
