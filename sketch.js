@@ -87,6 +87,16 @@ function fragmentAdded(key) {
 }
 
 function setupFb() {
+
+    fbRef.on("child_removed", function(snapshot) {
+        key = snapshot.key();
+        var i = fragmentAdded(key);
+        if(i != -1) {
+            fragments[i].img.remove();
+            fragments.splice(i,1);
+        }
+    });
+
     fbRef.on("value", function(snapshot) {
         var data = snapshot.val();
         
@@ -204,7 +214,7 @@ function generateMask() {
            if(ptInSelection(xOriginal,yOriginal)) {
                mask.set(x,y,color(255,0));
            }   
-           else mask.set(x,y,color(255,0,0));
+           else mask.set(x,y,color(255,3,243));
         }
     }
     mask.updatePixels();
@@ -297,7 +307,7 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFF0000, w : imW, h : imH});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFF03F3, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
         canvas.position(-width, -height);
         recImgVisible = true;
