@@ -76,7 +76,6 @@ function share(){
             saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
             //saveToFB(url, thisX, thisY, int(imW/scaleDownFactor), int(imH/scaleDownFactor));
         }).error(function() {
-            share();
             print("upload error");
         });
     }
