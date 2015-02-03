@@ -173,7 +173,9 @@ function changeFullscreen() {
 }
 
 function setup() {
-    print(window.location);
+    var test = (window.location != window.parent.location) ? document.referrer: document.location;
+    print(test);
+
     h = displayHeight;
     w = displayWidth;
     camW = w; camH = h;
@@ -294,7 +296,7 @@ function draw() {
     else {
         if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
         
-        if(frameCount - babyBorn > showBabyFor) {
+        if(fragments.length > 0 && frameCount - babyBorn > showBabyFor) {
             fragments[fragments.length-1].img.style("background-color","");
             baby = false;
         }
