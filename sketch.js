@@ -78,7 +78,7 @@ function share(){
             dataType: 'json'
         }).success(function(data) {
             var url = 'http://imgur.com/' + data.data.id + '.gif';
-            var thisX = random(w); var thisY = random(h);
+            var thisX = displayWidth/2; var thisY = displayHeight/2;
             print("Uploaded to imgur successfully.");
             print(url);
             print(imW);
@@ -128,8 +128,9 @@ function setupFb() {
                     thisImg.style("height", thisImH);
                     thisImg.style("background", "url('"+url+"') no-repeat");
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
-                    babyBorn = frameCount;
+
                     baby = true;
+                    babyBorn = frameCount;
                     if(fragments.length > 1) fragments[fragments.length-2].img.style("background-color","");
                     fragments[fragments.length-1].img.style("background-color","#F1FF94");
                 }
@@ -288,11 +289,13 @@ function draw() {
         }
     }
 
-    if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
-    
-    if(frameCount - babyBorn > showBabyFor) {
-        fragments[fragments.length-1].img.style("background-color","");
-        baby = false;
+    else {
+        if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
+        
+        if(frameCount - babyBorn > showBabyFor) {
+            fragments[fragments.length-1].img.style("background-color","");
+            baby = false;
+        }
     }
 }
 
