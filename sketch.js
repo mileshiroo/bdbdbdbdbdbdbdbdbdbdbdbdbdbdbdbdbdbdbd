@@ -35,7 +35,7 @@ var canvas;
 var captureButton;
 var fullscreenButton;
 var w; var h;
-var fbUrl = "https://torid-fire-4253.firebaseIO.com/fragments/";
+var fbUrl = "https://torid-fire-4253.firebaseIO.com/";
 var fbRef = new Firebase(fbUrl);
 
 function saveToFB(thisUrl, thisX, thisY, thisImW, thisImH) {
@@ -175,7 +175,11 @@ function setup() {
     if(loadedFrom.slice("http://".length,17) != "partsparts") {
         var endPoint = loadedFrom.indexOf(".partsparts");
         var room = loadedFrom.slice("http://".length, endPoint);
+        fbUrl += room.concat("/");
         print(room);
+    }
+    else {
+        fbUrl += "fragments/";
     }
     //something like: http://tahoeusntah.partsparts.parts
     //need to isolate first part and set firebase url to that atoehuntaoheunst so exciting!
