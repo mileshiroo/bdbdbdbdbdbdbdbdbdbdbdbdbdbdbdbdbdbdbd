@@ -1,12 +1,17 @@
-//some weird flickering shit in the bg
-//WTF IS IT?!?!?!?!?!??!??!?!??!??!?!?!?!?!?!??!?!?!?
+/*
+todo
+
+make recording interface fullscreen
+add analytics
+add instructions to 'add parts'
+autodocumentation
+list of ppl to invite
+*/
 var camW; var camH;
 var numFrames = 15;
 var framesAdded = 0;
 var gif = null;
 var gifData = null;
-var recImg;
-var recImgVisible = false;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
 var scaleDownFactor = 2;
@@ -16,6 +21,7 @@ var fragments = [];
 var buttons = [];
 var pickedUp = -1;
 var mask = null;
+var whiteMask = null;
 var recording = false;
 var rendering = false;
 var shared = false;
@@ -74,7 +80,6 @@ function share(){
             print(url);
             print(imW);
             saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
-            //saveToFB(url, thisX, thisY, int(imW/scaleDownFactor), int(imH/scaleDownFactor));
         }).error(function() {
             print("upload error");
         });
@@ -173,16 +178,12 @@ function setup() {
     captureButton.position(20,20);
     captureButton.style("zIndex","1");
 
-    fullscreenButton = createButton("fullscreen");
+    fullscreenButton = createButton("toggle fullscreen");
     fullscreenButton.position(100,20);
     fullscreenButton.mousePressed(changeFullscreen);
     
     buttons.push(captureButton);
     buttons.push(fullscreenButton);
-
-    recImg = createImg("recording.png");
-    recImg.position(width/2 - recImg.width/2,height/2 - recImg.height/2);
-    recImg.hide();
 }
 
 function hideButtons() {
@@ -206,6 +207,8 @@ function generateMask() {
     var imWDown = int(imW/scaleDownFactor); var imHDown = int(imH/scaleDownFactor);
     mask = createImage(imWDown, imHDown);
     mask.loadPixels();
+    whiteMask = createImage(imWDown, imHDown);
+    whiteMask.loadPixels();
     for(y = 0; y < imHDown; y++) {
         for(x = 0; x < imWDown; x++) {
            var xOriginal = (scaleDownFactor*x)+minPt.x; 
@@ -213,11 +216,17 @@ function generateMask() {
 
            if(ptInSelection(xOriginal,yOriginal)) {
                mask.set(x,y,color(255,0));
+               whiteMask.set(x,y,color(255,0));
            }   
-           else mask.set(x,y,color(0,255,0));
+           else {
+               mask.set(x,y,color(0,255,0));
+               whiteMask.set(x,y,color(255));
+           }
+            
         }
     }
     mask.updatePixels();
+    whiteMask.updatePixels();
 }
 
 function drawFragmentOutlines() {
@@ -227,34 +236,50 @@ function drawFragmentOutlines() {
     }
 }
 
-function showMessage(message) {
+function showMessage(message, color) {
     textAlign(CENTER);
     textSize(20);
-    fill(0);
+    if(typeof(color) === 'undefined') fill(0);
+    else fill(color);
     text(message, w/2, h*.4);
+}
+
+function camEnabled() {
+    return(capture != null && capture.attribute("src") != null);
 }
 
 function draw() {
     if(captureOn) {
-        if(recording){
-            clear();
-            image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
-            image(mask,0,0);
-            if(!rendering && framesAdded < numFrames) {
-                gif.addFrame(canvas.elt, {delay : 10, copy : true});
-                framesAdded++;
-            }   
-            else if(!rendering) {
-                rendering = true;
-                gif.render();
+        
+        if(camEnabled()) {
+            if(recording){
+                clear();
+                image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
+                image(mask,0,0);
+                if(!rendering && framesAdded < numFrames) {
+                    gif.addFrame(canvas.elt, {delay : 10, copy : true});
+                    framesAdded++;
+
+                }   
+                else if(!rendering) {
+                    rendering = true;
+                    gif.render();
+                }
+                clear();
+                image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
+                image(whiteMask,0,0);
+            }
+            else {
+                clear();
+                image(capture,0,0);
+                drawSelectionShape(); 
+                showMessage("lasso a part to add",color(255));
             }
         }
 
         else {
             clear();
             showMessage("please enable your cam");
-            image(capture,0,0);
-            drawSelectionShape(); 
         }
     }
 
@@ -265,7 +290,7 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-    if(focused && !(mouseX == 0 && mouseY == 0) && captureOn && mouseX < camW && mouseY < camH) {
+    if(camEnabled() && focused && !(mouseX == 0 && mouseY == 0) && captureOn && mouseX < camW && mouseY < camH) {
         if(mouseX < minPt.x || selection.length === 0) minPt.x = mouseX;
         if(mouseY < minPt.y || selection.length === 0) minPt.y = mouseY;
         if(mouseX > maxPt.x || selection.length === 0) maxPt.x = mouseX;
@@ -309,9 +334,7 @@ function mouseReleased() {
         generateMask();
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
-        canvas.position(-width, -height);
-        recImgVisible = true;
-        recImg.show();
+        canvas.position(displayWidth/2 - imW/2, displayHeight/2 - imH/2);
 
         gif.on('finished', function(blob) {
             framesAdded = 0;
@@ -321,8 +344,6 @@ function mouseReleased() {
             canvas.position(0,0);
             clear();
             background(255);
-            recImgVisible = false;
-            recImg.hide();
             recording = false;
             selection = [];
             showButtons();
