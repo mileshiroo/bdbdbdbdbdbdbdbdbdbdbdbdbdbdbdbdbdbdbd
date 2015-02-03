@@ -173,7 +173,7 @@ function changeFullscreen() {
 }
 
 function setup() {
-    print(window.location.pathname);
+    print(window.location);
     h = displayHeight;
     w = displayWidth;
     camW = w; camH = h;
