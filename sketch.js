@@ -172,7 +172,9 @@ function changeFullscreen() {
 
 function setup() {
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
-    if(loadedFrom.slice("http://".length,17) != "partsparts") {
+    print(loadedFrom);
+    var local = "file:///Users/milespeyton/Desktop/bdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbd/index.html";
+    if(loadedFrom != local && loadedFrom.slice("http://".length,17) != "partsparts") {
         var endPoint = loadedFrom.indexOf(".partsparts");
         var room = loadedFrom.slice("http://".length, endPoint);
         fbUrl += room.concat("/");
@@ -278,7 +280,7 @@ function draw() {
                 image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
                 image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
-                    gif.addFrame(canvas.elt, {delay : 10, copy : true});
+                    gif.addFrame(canvas.elt, {delay : 50, copy : true});
                     framesAdded++;
 
                 }   
