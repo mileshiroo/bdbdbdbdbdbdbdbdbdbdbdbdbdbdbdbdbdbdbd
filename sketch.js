@@ -176,11 +176,12 @@ function setup() {
         var endPoint = loadedFrom.indexOf(".partsparts");
         var room = loadedFrom.slice("http://".length, endPoint);
         fbUrl += room.concat("/");
-        print(room);
     }
     else {
         fbUrl += "fragments/";
     }
+    print(fbUrl);
+    //JUST ADDED ROOMS BUT IT MIGHT EXPLODE
     //something like: http://tahoeusntah.partsparts.parts
     //need to isolate first part and set firebase url to that atoehuntaoheunst so exciting!
 
