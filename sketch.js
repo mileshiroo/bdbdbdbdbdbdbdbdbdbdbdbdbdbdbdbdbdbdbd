@@ -3,6 +3,7 @@ todo
 
 make recording interface fullscreen
 add analytics
+add rooms after /  
 add instructions to 'add parts'
 autodocumentation
 list of ppl to invite
@@ -172,6 +173,7 @@ function changeFullscreen() {
 }
 
 function setup() {
+    print(window.location.pathname);
     h = displayHeight;
     w = displayWidth;
     camW = w; camH = h;
