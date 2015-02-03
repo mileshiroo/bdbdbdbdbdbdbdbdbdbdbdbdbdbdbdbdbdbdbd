@@ -53,7 +53,6 @@ function buildEndPoint (key) {
 }
 
 function updateFragment(key, x, y) {
-    print("updating");
     updateRef = buildEndPoint(key);
     updateRef.update({x:x,y:y});
 }
