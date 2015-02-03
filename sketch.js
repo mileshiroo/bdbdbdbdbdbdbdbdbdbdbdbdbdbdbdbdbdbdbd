@@ -57,7 +57,7 @@ function share(){
             url: 'https://api.imgur.com/3/upload.json',
             type: 'POST',
             headers: {
-                Authorization: 'Client-ID 2a3f1f63c9b0857'
+                Authorization: 'Client-ID bddb172ee5e0e2a'
             },
             data: {
                 image: (reader.result).replace('data:image/gif;base64,',''),
@@ -76,6 +76,7 @@ function share(){
             saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
             //saveToFB(url, thisX, thisY, int(imW/scaleDownFactor), int(imH/scaleDownFactor));
         }).error(function() {
+            share();
             print("upload error");
         });
     }
@@ -204,7 +205,7 @@ function generateMask() {
            if(ptInSelection(xOriginal,yOriginal)) {
                mask.set(x,y,color(255,0));
            }   
-           else mask.set(x,y,color(255,255,255));
+           else mask.set(x,y,color(255,0,0));
         }
     }
     mask.updatePixels();
@@ -227,6 +228,7 @@ function showMessage(message) {
 function draw() {
     if(captureOn) {
         if(recording){
+            clear();
             image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
             image(mask,0,0);
             if(!rendering && framesAdded < numFrames) {
@@ -254,7 +256,7 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-    if(!(mouseX == 0 && mouseY == 0) && captureOn && mouseX < camW && mouseY < camH) {
+    if(focused && !(mouseX == 0 && mouseY == 0) && captureOn && mouseX < camW && mouseY < camH) {
         if(mouseX < minPt.x || selection.length === 0) minPt.x = mouseX;
         if(mouseY < minPt.y || selection.length === 0) minPt.y = mouseY;
         if(mouseX > maxPt.x || selection.length === 0) maxPt.x = mouseX;
@@ -296,8 +298,9 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFF0000, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
+        canvas.position(-width, -height);
         recImgVisible = true;
         recImg.show();
 
@@ -306,6 +309,7 @@ function mouseReleased() {
             h = displayHeight;
             w = displayWidth;
             resizeCanvas(w, h);        
+            canvas.position(0,0);
             clear();
             background(255);
             recImgVisible = false;
