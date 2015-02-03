@@ -1,8 +1,12 @@
+//some weird flickering shit in the bg
+//WTF IS IT?!?!?!?!?!??!??!?!??!??!?!?!?!?!?!??!?!?!?
 var camW; var camH;
 var numFrames = 15;
 var framesAdded = 0;
 var gif = null;
 var gifData = null;
+var recImg;
+var recImgVisible = false;
 var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
 rootRef.child('users/mchen/name');
 var scaleDownFactor = 3;
@@ -11,11 +15,9 @@ var captureOn = false;
 var fragments = [];
 var buttons = [];
 var pickedUp = -1;
-var selectionImg = null;
 var mask = null;
 var recording = false;
 var rendering = false;
-var selectionCreated = false;
 var shared = false;
 var minPt = {x:0, y:0};
 var maxPt = {x:0, y:0};
@@ -70,7 +72,9 @@ function share(){
             var thisX = random(w); var thisY = random(h);
             print("Uploaded to imgur successfully.");
             print(url);
+            print(imW);
             saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
+            //saveToFB(url, thisX, thisY, int(imW/scaleDownFactor), int(imH/scaleDownFactor));
         }).error(function() {
             print("upload error");
         });
@@ -105,7 +109,7 @@ function setupFb() {
                     thisImg.position(thisX-thisImW/2, thisY-thisImH/2);
                     thisImg.style("width", thisImW);
                     thisImg.style("height", thisImH);
-                    thisImg.style("background", "url('"+url+"')");
+                    thisImg.style("background", "url('"+url+"') no-repeat");
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
                 }
             }
@@ -165,6 +169,10 @@ function setup() {
     
     buttons.push(captureButton);
     buttons.push(fullscreenButton);
+
+    recImg = createImg("recording.png");
+    recImg.position(width/2 - recImg.width/2,height/2 - recImg.height/2);
+    recImg.hide();
 }
 
 function hideButtons() {
@@ -196,7 +204,7 @@ function generateMask() {
            if(ptInSelection(xOriginal,yOriginal)) {
                mask.set(x,y,color(255,0));
            }   
-           else mask.set(x,y,color(255));
+           else mask.set(x,y,color(255,255,255));
         }
     }
     mask.updatePixels();
@@ -218,15 +226,11 @@ function showMessage(message) {
 
 function draw() {
     if(captureOn) {
-        background(255);
         if(recording){
-            background(255);
-            
-            image(capture,-minPt.x/scaleDownFactor,-minPt.y/scaleDownFactor,camW/scaleDownFactor,camH/scaleDownFactor);  
-            if(mask == null) print("wtf");
+            image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
             image(mask,0,0);
             if(!rendering && framesAdded < numFrames) {
-                gif.addFrame(canvas.elt, {delay : 50});
+                gif.addFrame(canvas.elt, {delay : 10, copy : true});
                 framesAdded++;
             }   
             else if(!rendering) {
@@ -293,7 +297,9 @@ function mouseReleased() {
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0xFFFFFF, w : imW, h : imH});
-        resizeCanvas(imW/scaleDownFactor, imH/scaleDownFactor);        
+        resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
+        recImgVisible = true;
+        recImg.show();
 
         gif.on('finished', function(blob) {
             framesAdded = 0;
@@ -302,6 +308,8 @@ function mouseReleased() {
             resizeCanvas(w, h);        
             clear();
             background(255);
+            recImgVisible = false;
+            recImg.hide();
             recording = false;
             selection = [];
             showButtons();
