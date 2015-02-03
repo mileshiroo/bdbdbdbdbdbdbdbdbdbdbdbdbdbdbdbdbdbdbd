@@ -21,6 +21,9 @@ var fragments = [];
 var buttons = [];
 var pickedUp = -1;
 var mask = null;
+var baby = false;
+var babyBorn = 1;
+var showBabyFor =  40;
 var whiteMask = null;
 var recording = false;
 var rendering = false;
@@ -92,7 +95,6 @@ function fragmentAdded(key) {
 }
 
 function setupFb() {
-
     fbRef.on("child_removed", function(snapshot) {
         key = snapshot.key();
         var i = fragmentAdded(key);
@@ -126,6 +128,10 @@ function setupFb() {
                     thisImg.style("height", thisImH);
                     thisImg.style("background", "url('"+url+"') no-repeat");
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
+                    babyBorn = frameCount;
+                    baby = true;
+                    if(fragments.length > 1) fragments[fragments.length-2].img.style("background-color","");
+                    fragments[fragments.length-1].img.style("background-color","#F1FF94");
                 }
             }
         
@@ -250,7 +256,6 @@ function camEnabled() {
 
 function draw() {
     if(captureOn) {
-        
         if(camEnabled()) {
             if(recording){
                 clear();
@@ -284,6 +289,11 @@ function draw() {
     }
 
     if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
+    
+    if(frameCount - babyBorn > showBabyFor) {
+        fragments[fragments.length-1].img.style("background-color","");
+        baby = false;
+    }
 }
 
 function mousePressed() {
