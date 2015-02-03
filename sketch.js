@@ -36,7 +36,7 @@ var captureButton;
 var fullscreenButton;
 var w; var h;
 var fbUrl = "https://torid-fire-4253.firebaseIO.com/";
-var fbRef = new Firebase(fbUrl);
+var fbRef;
 
 function saveToFB(thisUrl, thisX, thisY, thisImW, thisImH) {
     fbRef.push({
@@ -49,7 +49,7 @@ function saveToFB(thisUrl, thisX, thisY, thisImW, thisImH) {
 }
 
 function buildEndPoint (key) {
-    return new Firebase(fbUrl + "/" + key);
+    return new Firebase(fbUrl + key);
 }
 
 function updateFragment(key, x, y) {
@@ -181,6 +181,8 @@ function setup() {
     else {
         fbUrl += "fragments/";
     }
+    fbRef = new Firebase(fbUrl);
+
     print(fbUrl);
     //JUST ADDED ROOMS BUT IT MIGHT EXPLODE
     //something like: http://tahoeusntah.partsparts.parts
