@@ -49,10 +49,11 @@ function saveToFB(thisUrl, thisX, thisY, thisImW, thisImH) {
 }
 
 function buildEndPoint (key) {
-    return new Firebase(fbUrl + key);
+    return new Firebase(fbUrl + "/" + key);
 }
 
 function updateFragment(key, x, y) {
+    print("updating");
     updateRef = buildEndPoint(key);
     updateRef.update({x:x,y:y});
 }
