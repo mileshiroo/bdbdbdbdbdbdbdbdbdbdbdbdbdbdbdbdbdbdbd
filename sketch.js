@@ -13,8 +13,6 @@ var numFrames = 15;
 var framesAdded = 0;
 var gif = null;
 var gifData = null;
-var rootRef = new Firebase('https://docs-examples.firebaseio.com/web/data');
-rootRef.child('users/mchen/name');
 var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
@@ -173,8 +171,14 @@ function changeFullscreen() {
 }
 
 function setup() {
-    var test = (window.location != window.parent.location) ? document.referrer: document.location;
-    print(test);
+    var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
+    if(loadedFrom.slice("http://".length,17) != "partsparts") {
+        var endPoint = loadedFrom.indexOf(".partsparts");
+        var room = loadedFrom.slice("http://".length, endPoint);
+        print(room);
+    }
+    //something like: http://tahoeusntah.partsparts.parts
+    //need to isolate first part and set firebase url to that atoehuntaoheunst so exciting!
 
     h = displayHeight;
     w = displayWidth;
