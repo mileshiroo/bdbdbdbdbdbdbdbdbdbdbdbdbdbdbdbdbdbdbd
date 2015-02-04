@@ -7,9 +7,10 @@ add rooms after /
 add instructions to 'add parts'
 autodocumentation
 list of ppl to invite
+fullscreen broken?
 */
 var camW; var camH;
-var numFrames = 15;
+var numFrames = 30;
 var framesAdded = 0;
 var gif = null;
 var gifData = null;
@@ -364,7 +365,10 @@ function mouseReleased() {
         generateMask();
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
-        canvas.position(displayWidth/2 - imW/2, displayHeight/2 - imH/2);
+        //canvas.position(displayWidth/2 - imW/2, displayHeight/2 - imH/2);
+        //THIS MIGHT WORK
+        canvas.style("width",displayWidth);
+        canvas.style("height",displayHeight);
 
         gif.on('finished', function(blob) {
             framesAdded = 0;
