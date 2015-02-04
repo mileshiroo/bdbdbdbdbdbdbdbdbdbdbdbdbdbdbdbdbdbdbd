@@ -1,6 +1,5 @@
 /*
 todo
-
 make recording interface fullscreen
 add analytics
 add rooms after /  
@@ -9,6 +8,7 @@ autodocumentation
 list of ppl to invite
 fullscreen broken?
 */
+
 var camW; var camH;
 var numFrames = 30;
 var framesAdded = 0;
@@ -192,7 +192,7 @@ function changeFullscreen() {
 
 function setup() {
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
-    print(loadedFrom);
+    //print(loadedFrom);
     var local = "file:///Users/milespeyton/Desktop/bdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbd/index.html";
     if(loadedFrom != local && loadedFrom.slice("http://".length,17) != "partsparts") {
         var endPoint = loadedFrom.indexOf(".partsparts");
@@ -204,7 +204,7 @@ function setup() {
     }
     fbRef = new Firebase(fbUrl);
 
-    print(fbUrl);
+    //print(fbUrl);
     //JUST ADDED ROOMS BUT IT MIGHT EXPLODE
     //something like: http://tahoeusntah.partsparts.parts
     //need to isolate first part and set firebase url to that atoehuntaoheunst so exciting!
