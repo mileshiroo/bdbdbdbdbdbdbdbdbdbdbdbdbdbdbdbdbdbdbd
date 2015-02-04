@@ -8,9 +8,6 @@ add instructions to 'add parts'
 autodocumentation
 list of ppl to invite
 fullscreen broken?
-
-
-dragging is fucked up
 */
 var camW; var camH;
 var numFrames = 30;
