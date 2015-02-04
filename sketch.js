@@ -339,14 +339,10 @@ function draw() {
         if(baby) {
             if(fragments.length > 0 && frameCount - babyBorn > showBabyFor) {
                 baby = false;
-                fragments[fragments.length-1].img.style("opacity","1.0");
             }
             else {
                 var pct = (frameCount - babyBorn) / showBabyFor;
                 setFragmentOpacity(pct,fragments.length-1);
-                var b = showBabyFor/4;
-                var blink = frameCount % b > b/2 ? 1 : 0.5;
-                fragments[fragments.length-1].img.style("opacity",blink.toString());
             }
         }
     }
