@@ -67,7 +67,7 @@ function share(){
             url: 'https://api.imgur.com/3/upload.json',
             type: 'POST',
             headers: {
-                Authorization: 'Client-ID bddb172ee5e0e2a'
+                Authorization: 'Client-ID 2a3f1f63c9b0857'
             },
             data: {
                 image: (reader.result).replace('data:image/gif;base64,',''),
@@ -318,7 +318,6 @@ function draw() {
                 fill(255,255);
                 rect(0,height*(1-pct),width,height);
                 image(whiteMask,0,0);
-                
             }
             else {
                 clear();
