@@ -33,6 +33,7 @@ var whiteMask = null;
 var recording = false;
 var rendering = false;
 var shared = false;
+var layer = 0;
 var minPt = {x:0, y:0};
 var maxPt = {x:0, y:0};
 var imH; var imH;
@@ -134,7 +135,8 @@ function setupFb() {
                     thisImg.style("width", thisImW);
                     thisImg.style("height", thisImH);
                     thisImg.style("background", "url('"+url+"') no-repeat");
-                    fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key,url:url}); 
+                    fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key,url:url,layer:layer}); 
+                    layer++;
 
                     if(!init) {
                         baby = true;
@@ -155,12 +157,14 @@ function setupFb() {
 }
 
 function moveToTop(i) {
+    layer++;
     fragments[i].img.remove();
     fragments[i].img = createDiv("");
     fragments[i].img.position(fragments[i].x-fragments[i].imW/2,fragments[i].y-fragments[i].imH/2);
     fragments[i].img.style("width",fragments[i].imW);
     fragments[i].img.style("height",fragments[i].imH);
     fragments[i].img.style("background","url('"+fragments[i].url+"') no-repeat");
+    fragments[i].layer = layer;
 }
 
 function hideFragments() {
@@ -372,11 +376,15 @@ function mouseDragged() {
         selection.push({x:mouseX,y:mouseY}); 
     }
     if(pickedUp == -1 && !captureOn) {
+        topLayer = 0;
         for(i = 0; i < fragments.length; i++) {
             var w = fragments[i].imW; var h = fragments[i].imH;
             if(mouseX > fragments[i].x - w/2 && mouseX < fragments[i].x + w/2 &&
                mouseY > fragments[i].y - h/2 && mouseY < fragments[i].y+ h/2) {
-                pickedUp = i;
+                if(pickedUp == -1 || fragments[i].layer > topLayer) {
+                    pickedUp = i;
+                    topLayer = fragments[pickedUp].layer;
+                }
             }
         }
         if(pickedUp != -1) moveToTop(pickedUp);
