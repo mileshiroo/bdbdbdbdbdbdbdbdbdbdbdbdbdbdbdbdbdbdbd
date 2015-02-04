@@ -8,6 +8,9 @@ add instructions to 'add parts'
 autodocumentation
 list of ppl to invite
 fullscreen broken?
+
+
+dragging is fucked up
 */
 var camW; var camH;
 var numFrames = 30;
@@ -133,9 +136,7 @@ function setupFb() {
                     thisImg.style("background", "url('"+url+"') no-repeat");
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key,url:url}); 
 
-                    //make sure not to do ths initially
                     if(!init) {
-                        //what if baby is true already
                         baby = true;
                         babyBorn = frameCount;
                     } 
@@ -409,8 +410,6 @@ function mouseReleased() {
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
         canvas.position(0,0);
-        //canvas.position(displayWidth/2 - imW/2, displayHeight/2 - imH/2);
-        //THIS MIGHT WORK
         canvas.style("width",displayWidth);
         canvas.style("height",displayHeight);
 
@@ -437,7 +436,6 @@ function mouseReleased() {
 }
 
 function keyPressed() {
-    //delete current one
     if(keyCode == 88) {
         if(pickedUp != -1) {
             var selRef = buildEndPoint(fragments[pickedUp].key);
