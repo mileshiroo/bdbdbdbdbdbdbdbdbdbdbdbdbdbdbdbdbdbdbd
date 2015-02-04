@@ -17,6 +17,7 @@ var gifData = null;
 var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
+var init = true;
 var fragments = [];
 var buttons = [];
 var pickedUp = -1;
@@ -78,7 +79,8 @@ function share(){
             dataType: 'json'
         }).success(function(data) {
             var url = 'http://imgur.com/' + data.data.id + '.gif';
-            var thisX = displayWidth/2; var thisY = displayHeight/2;
+            //var thisX = displayWidth/2; var thisY = displayHeight/2;
+            var thisX = random(displayWidth*.2,displayWidth*.8); var thisY = random(displayHeight*.2,displayHeight*.8);
             print("Uploaded to imgur successfully.");
             print(url);
             print(imW);
@@ -123,16 +125,19 @@ function setupFb() {
                     var thisImW = data[key].imW;
                     var thisImH = data[key].imH;
                     var thisImg = createDiv("");
+                    if(captureOn) thisImg.hide();
                     thisImg.position(thisX-thisImW/2, thisY-thisImH/2);
                     thisImg.style("width", thisImW);
                     thisImg.style("height", thisImH);
                     thisImg.style("background", "url('"+url+"') no-repeat");
                     fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
 
-                    baby = true;
-                    babyBorn = frameCount;
-                    if(fragments.length > 1) fragments[fragments.length-2].img.style("background-color","");
-                    fragments[fragments.length-1].img.style("background-color","#F1FF94");
+                    //make sure not to do ths initially
+                    if(!init) {
+                        //what if baby is true already
+                        baby = true;
+                        babyBorn = frameCount;
+                    } 
                 }
             }
         
@@ -140,6 +145,7 @@ function setupFb() {
             //var selRef = buildEndPoint(key);
             //selRef.remove();
         }
+        if(init) init = false;
 
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code);
@@ -163,6 +169,7 @@ function startCam() {
     captureOn = true;
     cursor(CROSS);
     hideButtons();
+    setFragmentOpacity(1.0);
     hideFragments();    
 }
 
@@ -220,12 +227,17 @@ function showButtons() {
 }
 
 function drawSelectionShape() {
-    fill(200,200,255,120);
+    //fill(200,200,255,120);
+    push();
+    fill(255,80);
+    stroke(20);
+    strokeWeight(8);
     beginShape();
     for(var i = 0; i < selection.length; i++) {
        vertex(selection[i].x, selection[i].y); 
     } 
     endShape(CLOSE);
+    pop();
 }
 
 function generateMask() {
@@ -273,6 +285,13 @@ function camEnabled() {
     return(capture != null && capture.attribute("src") != null);
 }
 
+function setFragmentOpacity(val,exception) {
+    if(typeof(exception) === "undefined") {
+        for(i = 0; i < fragments.length; i++) fragments[i].img.style("opacity",val.toString());
+    }
+    else for(i = 0; i < fragments.length; i++) if(i != exception) fragments[i].img.style("opacity",val.toString());
+}
+
 function draw() {
     if(captureOn) {
         if(camEnabled()) {
@@ -290,8 +309,16 @@ function draw() {
                     gif.render();
                 }
                 clear();
+                
+                var pct;
+                if(typeof(gif.finishedFrames) == "undefnied") pct = 0;
+                else pct = (gif.finishedFrames+1)/numFrames;
                 image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
+                var start = -PI/2;
+                fill(255,255);
+                rect(0,height*(1-pct),width,height);
                 image(whiteMask,0,0);
+                
             }
             else {
                 clear();
@@ -310,12 +337,22 @@ function draw() {
     else {
         if(pickedUp != -1) updateFragment(fragments[pickedUp].key, mouseX, mouseY);
         
-        if(fragments.length > 0 && frameCount - babyBorn > showBabyFor) {
-            fragments[fragments.length-1].img.style("background-color","");
-            baby = false;
+        if(baby) {
+            if(fragments.length > 0 && frameCount - babyBorn > showBabyFor) {
+                baby = false;
+                fragments[fragments.length-1].img.style("opacity","1.0");
+            }
+            else {
+                var pct = (frameCount - babyBorn) / showBabyFor;
+                setFragmentOpacity(pct,fragments.length-1);
+                var b = showBabyFor/4;
+                var blink = frameCount % b > b/2 ? 1 : 0.5;
+                fragments[fragments.length-1].img.style("opacity",blink.toString());
+            }
         }
     }
 }
+
 
 function mousePressed() {
 }
@@ -365,6 +402,7 @@ function mouseReleased() {
         generateMask();
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
+        canvas.position(0,0);
         //canvas.position(displayWidth/2 - imW/2, displayHeight/2 - imH/2);
         //THIS MIGHT WORK
         canvas.style("width",displayWidth);
