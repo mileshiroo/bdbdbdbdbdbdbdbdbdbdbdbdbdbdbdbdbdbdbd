@@ -17,6 +17,7 @@ var gifData = null;
 var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
+var defaultRoom = "secret/";
 var init = true;
 var fragments = [];
 var buttons = [];
@@ -130,7 +131,7 @@ function setupFb() {
                     thisImg.style("width", thisImW);
                     thisImg.style("height", thisImH);
                     thisImg.style("background", "url('"+url+"') no-repeat");
-                    fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key}); 
+                    fragments.push({img:thisImg,x:thisX,y:thisY,imW:thisImW,imH:thisImH,key:key,url:url}); 
 
                     //make sure not to do ths initially
                     if(!init) {
@@ -150,6 +151,15 @@ function setupFb() {
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code);
     });
+}
+
+function moveToTop(i) {
+    fragments[i].img.remove();
+    fragments[i].img = createDiv("");
+    fragments[i].img.position(fragments[i].x-fragments[i].imW/2,fragments[i].y-fragments[i].imH/2);
+    fragments[i].img.style("width",fragments[i].imW);
+    fragments[i].img.style("height",fragments[i].imH);
+    fragments[i].img.style("background","url('"+fragments[i].url+"') no-repeat");
 }
 
 function hideFragments() {
@@ -188,7 +198,7 @@ function setup() {
         fbUrl += room.concat("/");
     }
     else {
-        fbUrl += "fragments/";
+        fbUrl += defaultRoom;
     }
     fbRef = new Firebase(fbUrl);
 
@@ -368,6 +378,7 @@ function mouseDragged() {
                 pickedUp = i;
             }
         }
+        if(pickedUp != -1) moveToTop(pickedUp);
     }
 }
 
