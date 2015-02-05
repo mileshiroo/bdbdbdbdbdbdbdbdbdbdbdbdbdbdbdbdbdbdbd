@@ -10,7 +10,7 @@ var numFrames = 30;
 var framesAdded = 0;
 var gif = null;
 var gifData = null;
-var scaleDownFactor = 2;
+var scaleDownFactor = 1;
 var selection = [];
 var captureOn = false;
 var defaultRoom = "secret/";
@@ -305,9 +305,8 @@ function draw() {
         if(camEnabled()) {
             if(recording){
                 clear();
-                //image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
-                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),100,100);  
-                image(mask,0,0,100,100);
+                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
+                image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50, copy : true});
                     framesAdded++;
