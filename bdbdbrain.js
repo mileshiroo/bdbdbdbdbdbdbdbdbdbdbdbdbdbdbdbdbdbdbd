@@ -306,10 +306,6 @@ function draw() {
             if(recording){
                 clear();
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
-
-                print("width");
-                print(Math.round(imW/scaleDownFactor));
-
                 image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50, copy : true});
@@ -413,8 +409,8 @@ function mouseReleased() {
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
         resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
-        canvas.style("width",w);
-        canvas.style("height",h);
+        //canvas.style("width",w);
+        //canvas.style("height",h);
 
         gif.on('finished', function(blob) {
             gifData = blob;
