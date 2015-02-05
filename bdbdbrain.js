@@ -308,8 +308,7 @@ function draw() {
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
-                    //gif.addFrame(canvas.elt, {delay : 50, copy : true});
-                    gif.addFrame(canvas.elt, {delay : 50});
+                    gif.addFrame(canvas.elt, {delay : 50, copy : true});
                     framesAdded++;
                 }   
                 else if(!rendering) {
