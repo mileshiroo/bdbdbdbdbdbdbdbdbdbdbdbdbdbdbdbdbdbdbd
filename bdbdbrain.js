@@ -406,7 +406,7 @@ function mouseReleased() {
         imW = Math.round(Math.abs(maxPt.x - minPt.x));
         imH = Math.round(Math.abs(maxPt.y - minPt.y));
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : 100, height : 100});
         resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
         //canvas.style("width",w);
