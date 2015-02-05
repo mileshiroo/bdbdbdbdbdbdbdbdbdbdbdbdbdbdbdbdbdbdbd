@@ -7,6 +7,8 @@ add instructions to 'add parts'
 autodocumentation
 list of ppl to invite
 fullscreen broken?
+
+take out bad int casts
 */
 
 var camW; var camH;
@@ -81,7 +83,6 @@ function share(){
             dataType: 'json'
         }).success(function(data) {
             var url = 'http://imgur.com/' + data.data.id + '.gif';
-            //var thisX = displayWidth/2; var thisY = displayHeight/2;
             var thisX = random(displayWidth*.2,displayWidth*.8); var thisY = random(displayHeight*.2,displayHeight*.8);
             print("Uploaded to imgur successfully.");
             print(url);
@@ -414,9 +415,10 @@ function mouseReleased() {
         generateMask();
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
+        //canvas.position(displayWidth/2 - (imW/scaleDownFactor)/2,displayHeight/2 - (imH/scaleDownFactor)/2);
         canvas.position(0,0);
-        canvas.style("width",displayWidth);
-        canvas.style("height",displayHeight);
+        //canvas.style("width",displayWidth);
+        //canvas.style("height",displayHeight);
 
         gif.on('finished', function(blob) {
             framesAdded = 0;
