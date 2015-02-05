@@ -206,6 +206,10 @@ function setup() {
 
     h = Math.round(displayHeight);
     w = Math.round(displayWidth);
+    print(w);
+    print(h);
+
+
     camW = w; camH = h;
     canvas = createCanvas(w, h);
     noStroke();
