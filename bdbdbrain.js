@@ -186,6 +186,7 @@ function changeFullscreen() {
 }
 
 function setup() {
+    devicePixelScaling(false);
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
     //print(loadedFrom);
     var local = "file:///Users/milespeyton/Desktop/bdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbd/index.html";
@@ -307,6 +308,7 @@ function draw() {
                 clear();
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 image(mask,0,0);
+                
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50, copy : true});
                     framesAdded++;
