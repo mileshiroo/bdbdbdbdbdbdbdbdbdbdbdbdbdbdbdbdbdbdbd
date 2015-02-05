@@ -240,7 +240,6 @@ function showButtons() {
 }
 
 function drawSelectionShape() {
-    //fill(200,200,255,120);
     push();
     fill(255,80);
     stroke(20);
