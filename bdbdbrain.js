@@ -214,17 +214,17 @@ function setup() {
     textFont("Arial");
     setupFb();
     
-    captureButton = createButton("add a part");
+    captureButton = createButton("+");
     captureButton.mousePressed(startCam); 
     captureButton.position(20,20);
     captureButton.style("zIndex","1");
 
-    fullscreenButton = createButton("toggle fullscreen");
-    fullscreenButton.position(100,20);
-    fullscreenButton.mousePressed(changeFullscreen);
+    //fullscreenButton = createButton("fullscreen");
+    //fullscreenButton.position(100,20);
+    //fullscreenButton.mousePressed(changeFullscreen);
     
     buttons.push(captureButton);
-    buttons.push(fullscreenButton);
+    //buttons.push(fullscreenButton);
 }
 
 function hideButtons() {
