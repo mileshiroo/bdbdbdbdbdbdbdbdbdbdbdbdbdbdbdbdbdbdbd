@@ -308,7 +308,7 @@ function draw() {
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
 
                 print("width");
-                print(Math.round(iW/scaleDownFactor));
+                print(Math.round(imW/scaleDownFactor));
 
                 image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
