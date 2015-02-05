@@ -1,14 +1,8 @@
 /*
 todo
-make recording interface fullscreen
-add analytics
-add rooms after /  
-add instructions to 'add parts'
 autodocumentation
-list of ppl to invite
-fullscreen broken?
 
-take out bad int casts
+LOL BREAKS ON MBP, WHY?
 */
 
 var camW; var camH;
@@ -87,7 +81,7 @@ function share(){
             print("Uploaded to imgur successfully.");
             print(url);
             print(imW);
-            saveToFB(url, thisX, thisY, imW/scaleDownFactor, imH/scaleDownFactor);
+            saveToFB(url, thisX, thisY, Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));
         }).error(function() {
             print("upload error");
         });
@@ -315,7 +309,6 @@ function draw() {
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50, copy : true});
                     framesAdded++;
-
                 }   
                 else if(!rendering) {
                     rendering = true;
@@ -416,13 +409,14 @@ function mouseReleased() {
         gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
         resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
-        canvas.style("width",displayWidth);
-        canvas.style("height",displayHeight);
+        canvas.style("width",w);
+        canvas.style("height",h);
 
         gif.on('finished', function(blob) {
+            gifData = blob;
+            share();
+
             framesAdded = 0;
-            h = displayHeight;
-            w = displayWidth;
             resizeCanvas(w, h);        
             canvas.position(0,0);
             clear();
@@ -434,9 +428,7 @@ function mouseReleased() {
             captureOn = false;
             cursor(ARROW);
             selectionImg = null;
-            gifData = blob;
             shared = true;
-            share();
         });
     }
 }
