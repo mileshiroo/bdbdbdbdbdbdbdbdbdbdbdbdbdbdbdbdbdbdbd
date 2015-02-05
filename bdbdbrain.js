@@ -414,7 +414,7 @@ function mouseReleased() {
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
         var downW = imW/scaleDownFactor; var downH = imH/scaleDownFactor;
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : downW, h : downH});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : downW, height : downH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
         //canvas.position(displayWidth/2 - (imW/scaleDownFactor)/2,displayHeight/2 - (imH/scaleDownFactor)/2);
         canvas.position(0,0);
