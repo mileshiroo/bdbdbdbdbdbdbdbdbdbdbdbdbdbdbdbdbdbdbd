@@ -206,9 +206,6 @@ function setup() {
 
     h = Math.round(displayHeight);
     w = Math.round(displayWidth);
-    print(w);
-    print(h);
-
 
     camW = w; camH = h;
     canvas = createCanvas(w, h);
@@ -320,14 +317,14 @@ function draw() {
                 }
                 clear();
                 
-                var pct;
+                /*var pct;
                 if(typeof(gif.finishedFrames) == "undefnied") pct = 0;
                 else pct = (gif.finishedFrames+1)/numFrames;
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 var start = -PI/2;
                 fill(255,255);
                 rect(0,height*(1-pct),width,height);
-                image(whiteMask,0,0);
+                image(whiteMask,0,0);*/
             }
             else {
                 clear();
