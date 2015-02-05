@@ -413,12 +413,13 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : imW, h : imH});
+        var downW = imW/scaleDownFactor; var downH = imH/scaleDownFactor;
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, w : downW, h : downH});
         resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
         //canvas.position(displayWidth/2 - (imW/scaleDownFactor)/2,displayHeight/2 - (imH/scaleDownFactor)/2);
         canvas.position(0,0);
-        //canvas.style("width",displayWidth);
-        //canvas.style("height",displayHeight);
+        canvas.style("width",displayWidth);
+        canvas.style("height",displayHeight);
 
         gif.on('finished', function(blob) {
             framesAdded = 0;
