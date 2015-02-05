@@ -308,7 +308,8 @@ function draw() {
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
-                    gif.addFrame(canvas.elt, {delay : 50, copy : true});
+                    //gif.addFrame(canvas.elt, {delay : 50, copy : true});
+                    gif.addFrame(canvas.elt, {delay : 50});
                     framesAdded++;
                 }   
                 else if(!rendering) {
@@ -406,10 +407,8 @@ function mouseReleased() {
         rendering = false;
         imW = Math.round(Math.abs(maxPt.x - minPt.x));
         imH = Math.round(Math.abs(maxPt.y - minPt.y));
-        imWDown = Math.round(imW/scaleDownFactor);
-        imHDown = Math.round(imH/scaleDownFactor);
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : imWDown, height : imHDown});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
         resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
         canvas.style("width",w);
