@@ -305,8 +305,9 @@ function draw() {
         if(camEnabled()) {
             if(recording){
                 clear();
-                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
-                image(mask,0,0);
+                //image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
+                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),100,100);  
+                image(mask,0,0,100,100);
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50, copy : true});
                     framesAdded++;
@@ -316,7 +317,6 @@ function draw() {
                     gif.render();
                 }
                 clear();
-                
                 var pct;
                 if(typeof(gif.finishedFrames) == "undefnied") pct = 0;
                 else pct = (gif.finishedFrames+1)/numFrames;
