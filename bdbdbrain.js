@@ -1,8 +1,6 @@
 /*
 todo
 autodocumentation
-
-LOL BREAKS ON MBP, WHY?
 */
 
 var camW; var camH;
@@ -16,6 +14,7 @@ var captureOn = false;
 var defaultRoom = "secret/";
 var init = true;
 var fragments = [];
+var showedTip = false;
 var buttons = [];
 var pickedUp = -1;
 var mask = null;
@@ -211,7 +210,7 @@ function setup() {
     camW = w; camH = h;
     canvas = createCanvas(w, h);
     noStroke();
-    textFont("Arial");
+    textFont("Times New Roman");
     setupFb();
     
     captureButton = createButton("+");
@@ -282,12 +281,16 @@ function drawFragmentOutlines() {
     }
 }
 
-function showMessage(message, color) {
+function showMessage(message,rand,color,pos) {
+    push();
     textAlign(CENTER);
-    textSize(20);
     if(typeof(color) === 'undefined') fill(0);
+    if(typeof(pos) === 'undefined') pos = {x: w/2, y: h*.4};
     else fill(color);
-    text(message, w/2, h*.4);
+    if(rand) textSize(random(20,20.8));
+    else textSize(20);
+    text(message, pos.x, pos.y);
+    pop();
 }
 
 function camEnabled() {
@@ -331,13 +334,15 @@ function draw() {
                 clear();
                 image(capture,0,0);
                 drawSelectionShape(); 
-                showMessage("lasso a part to add",color(255));
+                if(!showedTip &&  selection.length < 3) showMessage("click and drag to select a part",true,color(255,150),{x:mouseX,y:mouseY - 25});
+                else if(!showedTip) showedTip = true;
             }
         }
 
         else {
-            clear();
-            showMessage("please enable your cam");
+            //clear();
+            background(255);
+            showMessage("enable your webcam",true);
         }
     }
 
