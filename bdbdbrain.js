@@ -213,16 +213,21 @@ function setup() {
     textFont("Times New Roman");
     setupFb();
     
-    captureButton = createButton("+");
-    captureButton.mousePressed(startCam); 
-    captureButton.position(20,20);
-    captureButton.style("zIndex","1");
+    var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+    var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
+
+    if(!is_safari && !is_explorer) {
+        captureButton = createButton("+");
+        captureButton.mousePressed(startCam); 
+        captureButton.position(20,20);
+        captureButton.style("zIndex","1");
+        buttons.push(captureButton);
+    }
 
     //fullscreenButton = createButton("fullscreen");
     //fullscreenButton.position(100,20);
     //fullscreenButton.mousePressed(changeFullscreen);
     
-    buttons.push(captureButton);
     //buttons.push(fullscreenButton);
 }
 
@@ -334,7 +339,7 @@ function draw() {
                 clear();
                 image(capture,0,0);
                 drawSelectionShape(); 
-                if(!showedTip &&  selection.length < 3) showMessage("click and drag to select a part",true,color(255,150),{x:mouseX,y:mouseY - 25});
+                if(!showedTip &&  selection.length < 3) showMessage("click and drag to select a part",false,color(255,150),{x:mouseX,y:mouseY - 25});
                 else if(!showedTip) showedTip = true;
             }
         }
