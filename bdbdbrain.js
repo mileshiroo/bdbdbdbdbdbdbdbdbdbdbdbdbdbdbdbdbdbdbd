@@ -210,8 +210,8 @@ function setup() {
     //something like: http://tahoeusntah.partsparts.parts
     //need to isolate first part and set firebase url to that atoehuntaoheunst so exciting!
 
-    h = displayHeight;
-    w = displayWidth;
+    h = Math.round(displayHeight);
+    w = Math.round(displayWidth);
     camW = w; camH = h;
     canvas = createCanvas(w, h);
     noStroke();
@@ -254,7 +254,7 @@ function drawSelectionShape() {
 }
 
 function generateMask() {
-    var imWDown = int(imW/scaleDownFactor); var imHDown = int(imH/scaleDownFactor);
+    var imWDown = Math.round(imW/scaleDownFactor); var imHDown = Math.round(imH/scaleDownFactor);
     mask = createImage(imWDown, imHDown);
     mask.loadPixels();
     whiteMask = createImage(imWDown, imHDown);
@@ -310,7 +310,7 @@ function draw() {
         if(camEnabled()) {
             if(recording){
                 clear();
-                image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
+                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 image(mask,0,0);
                 if(!rendering && framesAdded < numFrames) {
                     gif.addFrame(canvas.elt, {delay : 50, copy : true});
@@ -326,7 +326,7 @@ function draw() {
                 var pct;
                 if(typeof(gif.finishedFrames) == "undefnied") pct = 0;
                 else pct = (gif.finishedFrames+1)/numFrames;
-                image(capture,-int(minPt.x/scaleDownFactor),-int(minPt.y/scaleDownFactor),int(camW/scaleDownFactor),int(camH/scaleDownFactor));  
+                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 var start = -PI/2;
                 fill(255,255);
                 rect(0,height*(1-pct),width,height);
@@ -413,10 +413,8 @@ function mouseReleased() {
         imW = Math.abs(maxPt.x - minPt.x);
         imH = Math.abs(maxPt.y - minPt.y);
         generateMask();
-        var downW = imW/scaleDownFactor; var downH = imH/scaleDownFactor;
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : downW, height : downH});
-        resizeCanvas(int(imW/scaleDownFactor), int(imH/scaleDownFactor));        
-        //canvas.position(displayWidth/2 - (imW/scaleDownFactor)/2,displayHeight/2 - (imH/scaleDownFactor)/2);
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
+        resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
         canvas.style("width",displayWidth);
         canvas.style("height",displayHeight);
