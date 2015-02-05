@@ -317,14 +317,14 @@ function draw() {
                 }
                 clear();
                 
-                /*var pct;
+                var pct;
                 if(typeof(gif.finishedFrames) == "undefnied") pct = 0;
                 else pct = (gif.finishedFrames+1)/numFrames;
                 image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
                 var start = -PI/2;
                 fill(255,255);
                 rect(0,height*(1-pct),width,height);
-                image(whiteMask,0,0);*/
+                image(whiteMask,0,0);
             }
             else {
                 clear();
@@ -406,8 +406,10 @@ function mouseReleased() {
         rendering = false;
         imW = Math.round(Math.abs(maxPt.x - minPt.x));
         imH = Math.round(Math.abs(maxPt.y - minPt.y));
+        imWDown = Math.round(imW/scaleDownFactor);
+        imHDown = Math.round(imH/scaleDownFactor);
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : imW, height : imH});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : imWDown, height : imHDown});
         resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
         canvas.style("width",w);
