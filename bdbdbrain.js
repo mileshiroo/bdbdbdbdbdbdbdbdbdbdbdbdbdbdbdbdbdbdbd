@@ -213,16 +213,16 @@ function setup() {
     textFont("Times New Roman");
     setupFb();
     
-    var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-    var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
+    //var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+    //var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
 
-    if(!is_safari && !is_explorer) {
+    //if((!is_safari) && (!is_explorer)) {
         captureButton = createButton("+");
         captureButton.mousePressed(startCam); 
         captureButton.position(20,20);
         captureButton.style("zIndex","1");
         buttons.push(captureButton);
-    }
+    //}
 
     //fullscreenButton = createButton("fullscreen");
     //fullscreenButton.position(100,20);
@@ -336,6 +336,14 @@ function draw() {
             }
             else {
                 clear();
+
+                //STRANGE, THIS ONLY WORKS HALF THE TIME
+                /*push(); 
+                translate(capture.width,0); 
+                scale(-1,1); 
+                image(capture,0,0); 
+                pop();*/
+
                 image(capture,0,0);
                 drawSelectionShape(); 
                 if(!showedTip &&  selection.length < 3) showMessage("click and drag to select a part",false,color(255,150),{x:mouseX,y:mouseY - 25});
