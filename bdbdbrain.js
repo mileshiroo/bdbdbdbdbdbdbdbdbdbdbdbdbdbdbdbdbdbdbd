@@ -406,11 +406,11 @@ function mouseReleased() {
         imW = Math.round(Math.abs(maxPt.x - minPt.x));
         imH = Math.round(Math.abs(maxPt.y - minPt.y));
         generateMask();
-        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00, width : 100, height : 100});
+        gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
         resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
         canvas.position(0,0);
-        //canvas.style("width",w);
-        //canvas.style("height",h);
+        canvas.style("width",w);
+        canvas.style("height",h);
 
         gif.on('finished', function(blob) {
             gifData = blob;
