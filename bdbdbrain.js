@@ -178,6 +178,11 @@ function startCam() {
     hideFragments();    
 }
 
+function hasGetUserMedia() {
+  return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia || navigator.msGetUserMedia);
+}
+
 function setup() {
     devicePixelScaling(false);
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
@@ -202,16 +207,16 @@ function setup() {
     textFont("Arial");
     setupFb();
     
-    //todo
-    //this doesn't work on chrome
-    //var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-    //var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
-    //if((!is_safari) && (!is_explorer)) {
+    if(hasGetUserMedia()) {
         captureButton = createButton("+");
         captureButton.mousePressed(startCam); 
         captureButton.position(20,20);
         captureButton.style("zIndex","1");
         buttons.push(captureButton);
+    }
+    else {
+        vex.dialog.alert('oops, you need to use a browser like Chrome or Firefox to add parts with your webcam');
+    }
 }
 
 function hideButtons() {
