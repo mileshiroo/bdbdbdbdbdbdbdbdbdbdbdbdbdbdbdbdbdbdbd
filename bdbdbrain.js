@@ -189,7 +189,7 @@ function setup() {
     }
     else {
         fbUrl += defaultRoom;
-        vex.dialog.alert('<p>partsparts.parts by <a href ="http://www.twitter.com/mileshiroo">@mileshiroo</a></p><p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
+        vex.dialog.alert('<p>partsparts.parts by <a target="_blank" href ="http://www.twitter.com/mileshiroo">@mileshiroo</a></p><p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
     }
     fbRef = new Firebase(fbUrl);
 
