@@ -194,7 +194,6 @@ function setup() {
     }
     else {
         fbUrl += defaultRoom;
-        vex.dialog.alert('<p>partsparts.parts by <a target="_blank" href ="http://www.twitter.com/mileshiroo">miles hiroo</a></p><p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
     }
     fbRef = new Firebase(fbUrl);
 
@@ -213,6 +212,7 @@ function setup() {
         captureButton.position(20,20);
         captureButton.style("zIndex","1");
         buttons.push(captureButton);
+        vex.dialog.alert('<p>partsparts.parts by <a target="_blank" href ="http://www.twitter.com/mileshiroo">miles hiroo</a></p><p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
     }
     else {
         vex.dialog.alert('oops, you need to use a browser like Chrome or Firefox to add parts with your webcam');
