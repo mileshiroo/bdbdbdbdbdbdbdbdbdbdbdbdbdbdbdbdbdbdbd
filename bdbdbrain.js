@@ -32,8 +32,8 @@ var imH; var imH;
 var capture = null;
 var canvas;
 var captureButton;
-var fullscreenButton;
 var w; var h;
+var newX; var newY; var newW; var newH;
 var fbUrl = "https://torid-fire-4253.firebaseIO.com/";
 var fbRef;
 
@@ -79,7 +79,6 @@ function share(){
             var thisX = random(displayWidth*.2,displayWidth*.8); var thisY = random(displayHeight*.2,displayHeight*.8);
             print("Uploaded to imgur successfully.");
             print(url);
-            print(imW);
             saveToFB(url, thisX, thisY, Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));
         }).error(function() {
             print("upload error");
@@ -136,7 +135,7 @@ function setupFb() {
                 }
             }
         
-            //UNCOMMENT THIS TO DELETE EVERYTHING
+            //this does something heh
             //var selRef = buildEndPoint(key);
             //selRef.remove();
         }
@@ -179,15 +178,9 @@ function startCam() {
     hideFragments();    
 }
 
-function changeFullscreen() {
-    var fs = fullscreen();
-    fullscreen(!fs);
-}
-
 function setup() {
     devicePixelScaling(false);
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
-    //print(loadedFrom);
     var local = "file:///Users/milespeyton/Desktop/bdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbd/index.html";
     if(loadedFrom != local && loadedFrom.slice("http://".length,17) != "partsparts") {
         var endPoint = loadedFrom.indexOf(".partsparts");
@@ -199,11 +192,6 @@ function setup() {
     }
     fbRef = new Firebase(fbUrl);
 
-    //print(fbUrl);
-    //JUST ADDED ROOMS BUT IT MIGHT EXPLODE
-    //something like: http://tahoeusntah.partsparts.parts
-    //need to isolate first part and set firebase url to that atoehuntaoheunst so exciting!
-
     h = Math.round(displayHeight);
     w = Math.round(displayWidth);
 
@@ -213,22 +201,16 @@ function setup() {
     textFont("Times New Roman");
     setupFb();
     
+    //todo
+    //this doesn't work on chrome
     //var is_safari = navigator.userAgent.indexOf("Safari") > -1;
     //var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
-
     //if((!is_safari) && (!is_explorer)) {
         captureButton = createButton("+");
         captureButton.mousePressed(startCam); 
         captureButton.position(20,20);
         captureButton.style("zIndex","1");
         buttons.push(captureButton);
-    //}
-
-    //fullscreenButton = createButton("fullscreen");
-    //fullscreenButton.position(100,20);
-    //fullscreenButton.mousePressed(changeFullscreen);
-    
-    //buttons.push(fullscreenButton);
 }
 
 function hideButtons() {
@@ -313,7 +295,11 @@ function draw() {
         if(camEnabled()) {
             if(recording){
                 clear();
-                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
+                push();
+                    translate(newW,0);
+                    scale(-1.0,1.0);
+                    image(capture,-newX,newY,newW,newH);
+                pop();
                 image(mask,0,0);
                 
                 if(!rendering && framesAdded < numFrames) {
@@ -328,7 +314,11 @@ function draw() {
                 var pct;
                 if(typeof(gif.finishedFrames) == "undefnied") pct = 0;
                 else pct = (gif.finishedFrames+1)/numFrames;
-                image(capture,-Math.round(minPt.x/scaleDownFactor),-Math.round(minPt.y/scaleDownFactor),Math.round(camW/scaleDownFactor),Math.round(camH/scaleDownFactor));  
+                push();
+                    translate(newW,0);
+                    scale(-1.0,1.0);
+                    image(capture,-newX,newY,newW,newH);
+                pop();
                 var start = -PI/2;
                 fill(255,255);
                 rect(0,height*(1-pct),width,height);
@@ -337,14 +327,12 @@ function draw() {
             else {
                 clear();
 
-                //STRANGE, THIS ONLY WORKS HALF THE TIME
-                /*push(); 
+                push(); 
                 translate(capture.width,0); 
-                scale(-1,1); 
+                scale(-1.0,1.0); 
                 image(capture,0,0); 
-                pop();*/
+                pop();
 
-                image(capture,0,0);
                 drawSelectionShape(); 
                 if(!showedTip &&  selection.length < 3) showMessage("click and drag to select a part",false,color(255,150),{x:mouseX,y:mouseY - 25});
                 else if(!showedTip) showedTip = true;
@@ -420,6 +408,8 @@ function ptInSelection(x, y) {
 function mouseReleased() {
     if(pickedUp != -1) pickedUp = -1;
     if(selection.length >= 3 && !recording) {
+        newX = -Math.round(minPt.x/scaleDownFactor); newY = -Math.round(minPt.y/scaleDownFactor);
+        newW = Math.round(camW/scaleDownFactor); newH = Math.round(camH/scaleDownFactor);
         recording = true;
         rendering = false;
         imW = Math.round(Math.abs(maxPt.x - minPt.x));
