@@ -12,6 +12,7 @@ var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
 var defaultRoom = "secret/";
+var thisRoom = defaultRoom;
 var init = true;
 var fragments = [];
 var showedTip = false;
@@ -191,12 +192,15 @@ function setup() {
     if(loadedFrom != local && loadedFrom.slice("http://".length,17) != "partsparts") {
         var endPoint = loadedFrom.indexOf(".partsparts");
         var room = loadedFrom.slice("http://".length, endPoint);
+        thisRoom = room;
         fbUrl += room.concat("/");
     }
     else {
         fbUrl += defaultRoom;
         inDefault = true;
+        thisRoom = "partsparts.parts";
     }
+    window.document.title = thisRoom;
     fbRef = new Firebase(fbUrl);
 
     h = Math.round(displayHeight);
@@ -204,6 +208,16 @@ function setup() {
 
     camW = w; camH = h;
     canvas = createCanvas(w, h);
+
+    /*
+    //ADD ABILITY TO CHANGE BACKGROUND IMAGE
+    var bg = createDiv("");
+    bg.style("width",displayWidth.toString()); bg.style("height",displayHeight.toString());
+    bg.position(0,0);
+    bg.style("background-image", "url(http://image.xinli001.com/20130409/093804398bc605b0aa162c.jpg)");
+    bg.style("background-size","100%");
+    */
+
     noStroke();
     textFont("Arial");
     setupFb();
@@ -304,7 +318,7 @@ function draw() {
     if(captureOn) {
         if(camEnabled()) {
             if(!showedTip) {
-                vex.dialog.alert('click and drag to select a part');
+                vex.dialog.alert('<p>click and drag to select a part</p> <p>recording starts when you let go</p>');
                 showedTip = true;
             }
             if(recording){
@@ -422,6 +436,7 @@ function mouseReleased() {
         newX = -Math.round(minPt.x/scaleDownFactor); newY = -Math.round(minPt.y/scaleDownFactor);
         newW = Math.round(camW/scaleDownFactor); newH = Math.round(camH/scaleDownFactor);
         recording = true;
+        window.document.title = "RECORDING";
         rendering = false;
         imW = Math.round(Math.abs(maxPt.x - minPt.x));
         imH = Math.round(Math.abs(maxPt.y - minPt.y));
@@ -442,6 +457,7 @@ function mouseReleased() {
             clear();
             background(255);
             recording = false;
+            window.document.title = thisRoom;
             selection = [];
             showButtons();
             showFragments();
