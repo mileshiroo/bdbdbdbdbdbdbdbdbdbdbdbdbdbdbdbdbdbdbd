@@ -189,6 +189,7 @@ function setup() {
     }
     else {
         fbUrl += defaultRoom;
+        vex.dialog.alert('<p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
     }
     fbRef = new Firebase(fbUrl);
 
@@ -198,7 +199,7 @@ function setup() {
     camW = w; camH = h;
     canvas = createCanvas(w, h);
     noStroke();
-    textFont("Times New Roman");
+    textFont("Arial");
     setupFb();
     
     //todo
@@ -293,6 +294,10 @@ function setFragmentOpacity(val,exception) {
 function draw() {
     if(captureOn) {
         if(camEnabled()) {
+            if(!showedTip) {
+                vex.dialog.alert('click and drag to select a part');
+                showedTip = true;
+            }
             if(recording){
                 clear();
                 push();
@@ -334,15 +339,12 @@ function draw() {
                 pop();
 
                 drawSelectionShape(); 
-                if(!showedTip &&  selection.length < 3) showMessage("click and drag to select a part",false,color(255,150),{x:mouseX,y:mouseY - 25});
-                else if(!showedTip) showedTip = true;
             }
         }
 
         else {
-            //clear();
             background(255);
-            showMessage("enable your webcam",true);
+            showMessage("enable your webcam",false);
         }
     }
 
