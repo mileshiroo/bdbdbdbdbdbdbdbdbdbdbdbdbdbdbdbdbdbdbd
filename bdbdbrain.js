@@ -11,11 +11,13 @@ var gifData = null;
 var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
-var defaultRoom = "secret/";
+var defaultRoom = "hello/";
+var confirmOpen = false;
 var thisRoom = defaultRoom;
 var init = true;
 var fragments = [];
 var showedTip = false;
+var showedInfo = false;
 var buttons = [];
 var pickedUp = -1;
 var mask = null;
@@ -185,6 +187,8 @@ function hasGetUserMedia() {
 }
 
 function setup() {
+    vex.dialog.buttons.YES.text = 'ok';
+    vex.dialog.buttons.NO.text = 'no';
     devicePixelScaling(false);
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
     var local = "file:///Users/milespeyton/Desktop/bdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbdbd/index.html";
@@ -219,21 +223,34 @@ function setup() {
     */
 
     noStroke();
-    textFont("Arial");
+    textFont("Helvetica");
     setupFb();
     
     if(hasGetUserMedia()) {
         captureButton = createButton("+");
         captureButton.mousePressed(startCam); 
         captureButton.position(20,20);
+        //captureButton.style("background-color","black");
+        captureButton.style("background","none");
+        
+        //captureButton.style("color","white");
+        captureButton.style("padding","0");
+        captureButton.style("border","1px solid");
+        captureButton.style("width","40");
+        captureButton.style("height","40");
+        captureButton.style("font-size","19");
         captureButton.style("zIndex","1");
         buttons.push(captureButton);
-        if(inDefault) {
+        vex.dialog.alert('drag parts, or record parts');
+        /*if(inDefault) {
             vex.dialog.alert('<p>partsparts.parts by <a target="_blank" href ="http://www.twitter.com/mileshiroo">miles hiroo</a></p><p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
         }
+        else {
+            vex.dialog.alert('drag parts around or record a gif of yourself');
+        }*/
     }
     else {
-        vex.dialog.alert('oops, you need to use a browser like Chrome or Firefox to add parts with your webcam');
+        vex.dialog.alert('drag parts (you need to use a browser like Chrome or Firefox to record parts)');
     }
 }
 
@@ -248,8 +265,8 @@ function showButtons() {
 function drawSelectionShape() {
     push();
     fill(255,80);
-    stroke(20);
-    strokeWeight(8);
+    stroke(0);
+    strokeWeight(4);
     beginShape();
     for(var i = 0; i < selection.length; i++) {
        vertex(selection[i].x, selection[i].y); 
@@ -318,7 +335,7 @@ function draw() {
     if(captureOn) {
         if(camEnabled()) {
             if(!showedTip) {
-                vex.dialog.alert('<p>click and drag to select a part</p> <p>recording starts when you let go</p>');
+                vex.dialog.alert('click and drag to select a part');
                 showedTip = true;
             }
             if(recording){
@@ -366,7 +383,7 @@ function draw() {
         }
 
         else {
-            background(255);
+            clear();
             showMessage("enable your webcam",false);
         }
     }
@@ -392,11 +409,10 @@ function mousePressed() {
 
 function mouseDragged() {
     if(camEnabled() && focused && !(mouseX == 0 && mouseY == 0) && captureOn && mouseX < camW && mouseY < camH) {
-        if(mouseX < minPt.x || selection.length === 0) minPt.x = mouseX;
-        if(mouseY < minPt.y || selection.length === 0) minPt.y = mouseY;
-        if(mouseX > maxPt.x || selection.length === 0) maxPt.x = mouseX;
-        if(mouseY > maxPt.y || selection.length === 0) maxPt.y = mouseY;
         selection.push({x:mouseX,y:mouseY}); 
+        var convexHull = new ConvexHullGrahamScan();
+        for(i = 0; i < selection.length; i++) convexHull.addPoint(selection[i].x,selection[i].y);
+        selection = convexHull.getHull();
     }
     if(pickedUp == -1 && !captureOn) {
         topLayer = 0;
@@ -430,9 +446,89 @@ function ptInSelection(x, y) {
     return oddNodes;
 }
 
+function getSelectionCenter() {
+    var totalX = 0;
+    var totalY = 0;
+    for(i = 0; i < selection.length; i++) {
+       totalX += selection[i].x;
+       totalY += selection[i].y; 
+    }
+    var centerPt = {x : (totalX/selection.length), y : (totalY/selection.length)};
+    return centerPt;
+}
+
+function setupRecording() {
+    newX = -Math.round(minPt.x/scaleDownFactor); newY = -Math.round(minPt.y/scaleDownFactor);
+    newW = Math.round(camW/scaleDownFactor); newH = Math.round(camH/scaleDownFactor);
+    recording = true;
+    window.document.title = "RECORDING";
+    rendering = false;
+    imW = Math.round(Math.abs(maxPt.x - minPt.x));
+    imH = Math.round(Math.abs(maxPt.y - minPt.y));
+    generateMask();
+    gif = new GIF({workers: 2, quality: 10, repeat : 0, transparent : 0x00FF00});
+    resizeCanvas(Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));        
+    canvas.position(0,0);
+    canvas.style("width",w);
+    canvas.style("height",h);
+
+    gif.on('finished', function(blob) {
+        gifData = blob;
+        share();
+
+        framesAdded = 0;
+        resizeCanvas(w, h);        
+        canvas.position(0,0);
+        clear();
+        background(255);
+        recording = false;
+        window.document.title = thisRoom;
+        selection = [];
+        showButtons();
+        showFragments();
+        captureOn = false;
+        cursor(ARROW);
+        selectionImg = null;
+        shared = true;
+        if(!showedInfo) {
+            vex.dialog.alert('adding your part. it may take a moment.')
+            showedInfo = true;
+        }
+    });
+}
+
+function cross(o, a, b) {
+   return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+}
+
+function calculateMinMax() {
+    minPt = {x : -1, y : -1}; maxPt = {x : -1, y : -1};
+    for(i = 0; i < selection.length; i++) {
+        if((minPt.x == -1) || (selection[i].x < minPt.x)) minPt.x = selection[i].x;
+        if((minPt.y == -1) || (selection[i].y < minPt.y)) minPt.y = selection[i].y;
+
+        if((maxPt.x == -1) || (selection[i].x > maxPt.x)) maxPt.x = selection[i].x;
+        if((maxPt.y == -1) || (selection[i].y > maxPt.y)) maxPt.y = selection[i].y;
+    }
+}
+
 function mouseReleased() {
     if(pickedUp != -1) pickedUp = -1;
-    if(selection.length >= 3 && !recording) {
+    if(!confirmOpen && selection.length >= 3 && !recording) {
+        calculateMinMax();
+        confirmOpen = true;
+        vex.dialog.confirm({
+            message: 'record this part?',
+            callback: function(value) {
+                confirmOpen = false;
+                if(value) {
+                    setupRecording();
+                }
+                else selection = [];
+            }
+        });
+    }
+    /*if(selection.length >= 3 && !recording) {
         newX = -Math.round(minPt.x/scaleDownFactor); newY = -Math.round(minPt.y/scaleDownFactor);
         newW = Math.round(camW/scaleDownFactor); newH = Math.round(camH/scaleDownFactor);
         recording = true;
@@ -466,7 +562,7 @@ function mouseReleased() {
             selectionImg = null;
             shared = true;
         });
-    }
+    }*/
 }
 
 function keyPressed() {
