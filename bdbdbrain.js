@@ -250,7 +250,7 @@ function setup() {
         }*/
     }
     else {
-        vex.dialog.alert('drag parts (you need to use a browser like Chrome or Firefox to record parts)');
+        vex.dialog.alert('<p>drag parts</p> <p>you need to use a browser like Chrome or Firefox to record parts</p>');
     }
 }
 
