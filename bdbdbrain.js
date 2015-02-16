@@ -11,6 +11,8 @@ var gifData = null;
 var scaleDownFactor = 2;
 var selection = [];
 var captureOn = false;
+var initialMessage = "";
+var showedInitialMessage = false;
 var defaultRoom = "hello/";
 var confirmOpen = false;
 var thisRoom = defaultRoom;
@@ -169,6 +171,7 @@ function showFragments() {
 }
 
 function startCam() {
+    showedInitialMessage = true;
     if(capture == null) {
         capture = createCapture(VIDEO);
         capture.size(camW, camH);
@@ -187,7 +190,7 @@ function hasGetUserMedia() {
 }
 
 function setup() {
-    vex.dialog.buttons.YES.text = 'ok';
+    vex.dialog.buttons.YES.text = 'k';
     vex.dialog.buttons.NO.text = 'no';
     devicePixelScaling(false);
     var loadedFrom = ((window.location != window.parent.location) ? document.referrer: document.location).toString();
@@ -241,16 +244,10 @@ function setup() {
         captureButton.style("font-size","19");
         captureButton.style("zIndex","1");
         buttons.push(captureButton);
-        vex.dialog.alert('drag parts, or record parts');
-        /*if(inDefault) {
-            vex.dialog.alert('<p>partsparts.parts by <a target="_blank" href ="http://www.twitter.com/mileshiroo">miles hiroo</a></p><p>drag parts around on the screen</p> <p>add your own</p> <p>or create a new room like: http://newsecretroom.partsparts.parts</p>')
-        }
-        else {
-            vex.dialog.alert('drag parts around or record a gif of yourself');
-        }*/
+        initialMessage = "<p>hey. arrange these parts?</p> <p>you can also add new parts</p> <p>for us to play with..</p>";
     }
     else {
-        vex.dialog.alert('<p>drag parts</p> <p>you need to use a browser like Chrome or Firefox to record parts</p>');
+        initialMessage = "<p>hey. arrange these parts?</p> <p>you need a browser like Chrome</p> <p>to record new ones..</p>";  
     }
 }
 
@@ -335,7 +332,7 @@ function draw() {
     if(captureOn) {
         if(camEnabled()) {
             if(!showedTip) {
-                vex.dialog.alert('click and drag to select a part');
+                vex.dialog.alert('click and drag to select the part');
                 showedTip = true;
             }
             if(recording){
@@ -405,6 +402,10 @@ function draw() {
 
 
 function mousePressed() {
+    if(!showedInitialMessage) {
+        vex.dialog.alert(initialMessage);
+        showedInitialMessage = true;
+    }
 }
 
 function mouseDragged() {
@@ -491,7 +492,7 @@ function setupRecording() {
         selectionImg = null;
         shared = true;
         if(!showedInfo) {
-            vex.dialog.alert('adding your part. it may take a moment.')
+            vex.dialog.alert("adding your part. it'll take a moment.")
             showedInfo = true;
         }
     });
