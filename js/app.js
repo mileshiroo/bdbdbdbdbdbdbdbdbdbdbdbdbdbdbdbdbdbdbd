@@ -219,7 +219,7 @@ var partspartsparts = function(p) {
         enableYourCam.style("height", "auto");
         enableYourCam.style("position", "absolute");
         enableYourCam.style("white-space", "nowrap");
-        enableYourCam.style("font-family", "Helvetica");
+        enableYourCam.style("font-family", "Helvetica Neue");
         enableYourCam.style("font-size", "large");
         enableYourCam.style("text-align", "center");
         enableYourCam.style("zIndex","-1");
