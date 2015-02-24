@@ -62,29 +62,32 @@ var partspartsparts = function(p) {
         var reader = new window.FileReader();
         reader.readAsDataURL(gifData);
         reader.onloadend = function () {
-            $.ajax({
-                url: 'https://api.imgur.com/3/upload.json',
-                type: 'POST',
-                headers: {
-                    Authorization: 'Client-ID 2a3f1f63c9b0857'
-                },
+    
+           $.ajax({
+                url: 'https://imgur-apiv3.p.mashape.com/3/image', 
+                type: 'POST', // The HTTP Method
                 data: {
                     image: (reader.result).replace('data:image/gif;base64,',''),
                     type: 'base64',
-                    name: 'hehehe',
-                    title: 'hehehe',
-                    description: 'hehehe',
+                    name: '',
+                    title: '',
+                    description: '',
+                }, // Additional parameters here
+                datatype: 'json',
+                success: function(data) { 
+                    var url = 'http://imgur.com/' + data.data.id + '.gif';
+                    var thisX = p.random(p.windowWidth*.2,p.windowWidth*.8); 
+                    var thisY = p.random(p.windowHeight*.2,p.windowHeight*.8);
+                    saveToFB(url, thisX, thisY, Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));
                 },
-                dataType: 'json'
-            }).success(function(data) {
-                var url = 'http://imgur.com/' + data.data.id + '.gif';
-                var thisX = p.random(p.windowWidth*.2,p.windowWidth*.8); 
-                var thisY = p.random(p.windowHeight*.2,p.windowHeight*.8);
-                p.print("Uploaded to imgur successfully.");
-                p.print(url);
-                saveToFB(url, thisX, thisY, Math.round(imW/scaleDownFactor), Math.round(imH/scaleDownFactor));
-            }).error(function() {
-                p.print("upload error");
+                error: function(err) { 
+                    console.log(err);
+                    vex.dialog.alert('there was a problem adding your part. try later?');
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("Authorization", "Client-ID 2a3f1f63c9b0857");
+                    xhr.setRequestHeader("X-Mashape-Key", "f5aNEuM4rRmshuZZP4zreFE5eI3Yp1I3wKQjsn6AH634JS6BZF"); // Enter here your Mashape key
+                }
             });
         }
     }
@@ -127,6 +130,17 @@ var partspartsparts = function(p) {
         } 
     }   
 
+    function moveToTop(i) {
+        layer++;
+        fragments[i].img.remove();
+        fragments[i].img = p.createDiv("");
+        fragments[i].img.position(fragments[i].x-fragments[i].imW/2,fragments[i].y-fragments[i].imH/2);
+        fragments[i].img.style("width",fragments[i].imW);
+        fragments[i].img.style("height",fragments[i].imH);
+        fragments[i].img.style("background","url('"+fragments[i].url+"') no-repeat");
+        fragments[i].layer = layer;
+    }
+
     function setupReceiveFragment() {
         fbRef.on("value", function(snapshot) {
             var data = snapshot.val();
@@ -141,6 +155,7 @@ var partspartsparts = function(p) {
                       fragments[fragIndex].img.position(thisX-fragments[fragIndex].imW/2, thisY-fragments[fragIndex].imH/2);
                       fragments[fragIndex].x = thisX;
                       fragments[fragIndex].y = thisY;
+                      anotherPickedUp = fragIndex;
                     }
                     else {
                       addFragLocally(data,key);
@@ -158,17 +173,6 @@ var partspartsparts = function(p) {
         fbRef = new Firebase(fbUrl);
         setupRemoveFragment();
         setupReceiveFragment();
-    }
-
-    function moveToTop(i) {
-        layer++;
-        fragments[i].img.remove();
-        fragments[i].img = p.createDiv("");
-        fragments[i].img.position(fragments[i].x-fragments[i].imW/2,fragments[i].y-fragments[i].imH/2);
-        fragments[i].img.style("width",fragments[i].imW);
-        fragments[i].img.style("height",fragments[i].imH);
-        fragments[i].img.style("background","url('"+fragments[i].url+"') no-repeat");
-        fragments[i].layer = layer;
     }
 
     function hideFragments() {
