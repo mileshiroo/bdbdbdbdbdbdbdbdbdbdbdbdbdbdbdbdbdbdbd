@@ -545,7 +545,7 @@ var partspartsparts = function(p) {
     };
 
     //do something about this
-    p.keyPressed = function() {
+    /*p.keyPressed = function() {
         if(p.keyCode == 88) {
             if(pickedUp != -1) {
                 var selRef = buildEndPoint(fragments[pickedUp].key);
@@ -555,7 +555,7 @@ var partspartsparts = function(p) {
                 pickedUp = -1;
             }
         } 
-    };
+    };*/
 };
 
 var myp5 = new p5(partspartsparts);
