@@ -268,7 +268,7 @@ var partspartsparts = function(p) {
         setupFb();
         
         if(hasGetUserMedia()) {
-            setupButton();
+            //setupButton(); uncomment to enable parts adding
             initialMessage = "<p>move parts</p> <p>or add your own</p>";
         }
         else {
