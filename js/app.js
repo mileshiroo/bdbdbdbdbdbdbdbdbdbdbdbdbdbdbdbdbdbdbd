@@ -269,10 +269,12 @@ var partspartsparts = function(p) {
         
         if(hasGetUserMedia()) {
             //setupButton(); uncomment to enable parts adding
-            initialMessage = "<p>move parts</p> <p>or add your own</p>";
+            //initialMessage = "<p>move parts</p> <p>or add your own</p>";
+            initialMessage = "<p>move parts</p>";
         }
         else {
-            initialMessage = "<p>arrange parts..</p> <p>you need a browser like Chrome</p> <p>to record new ones..</p>";  
+            //initialMessage = "<p>arrange parts..</p> <p>you need a browser like Chrome</p> <p>to record new ones..</p>";  
+            initialMessage = "<p>move parts</p>";
         }
     };
 
